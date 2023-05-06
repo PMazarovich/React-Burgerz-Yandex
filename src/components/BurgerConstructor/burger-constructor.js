@@ -2,6 +2,7 @@ import React from 'react';
 import {Button, ConstructorElement, CurrencyIcon, DragIcon} from "@ya.praktikum/react-developer-burger-ui-components";
 import dataStub from "../../utils/data";
 import constructorStyles from './burger-constructor.module.css'
+import PropTypes from "prop-types";
 
 
 function ScrollComponent(props) {
@@ -12,7 +13,6 @@ function ScrollComponent(props) {
         // calculate the max scrollable height
         return window.innerHeight - distanceFromBottom
     }
-
     return (
         <div style={{maxHeight: calculateHeight(distanceFromBottom), overflow: "auto", width: "fit-content"}}
              className={`custom-scroll`}>
@@ -20,6 +20,9 @@ function ScrollComponent(props) {
         </div>
     )
 
+}
+ScrollComponent.propTypes = {
+    distanceFromBottom: PropTypes.number
 }
 
 function ConstructorElementWrapper(props) { /*this adds DragIcon in the left of ConstructorElement*/
@@ -45,8 +48,8 @@ function BurgerConstructor(props) {
                 thumbnail={'https://code.s3.yandex.net/react/code/bun-02.png'}
             />
             <ScrollComponent distanceFromBottom={400}>
-                {dataStub.map(x =>
-                    <ConstructorElementWrapper>
+                {dataStub.map((x, index) =>
+                    <ConstructorElementWrapper key={index}>
                         <ConstructorElement text={x.name} thumbnail={x.image} price={x.price}/>
                     </ConstructorElementWrapper>)}
             </ScrollComponent>

@@ -3,11 +3,18 @@ import {CurrencyIcon, Tab} from "@ya.praktikum/react-developer-burger-ui-compone
 import burgerConstructorStyles from './burger-ingredients.module.css'
 import counterImage from '../../images/counterIcon.png'
 import dataStub from "../../utils/data";
+import PropTypes from "prop-types";
 
 
 // Define a functional component called MyComponent
 function BurgerIngredients(props) {
     const [currentTab, setCurrentTab] = React.useState('one')
+
+    /* Стараться всё, что можно делать в JS, а результаты уже рендерить в JSX */
+    const buns = dataStub.filter((item) => item.type === 'bun')
+    const mains = dataStub.filter((item) => item.type === 'main')
+    const sauces = dataStub.filter((item) => item.type === 'sauce')
+
 
     function calculateHeight(distanceFromBottom = 200) {
         // get the height of the screen
@@ -30,6 +37,10 @@ function BurgerIngredients(props) {
 
         );
     }
+    FoodSection.propTypes = {
+        sectionName: PropTypes.string
+    };
+
 
     function FoodCounter(props) { /* this component should be placed inside relative component!*/
         const {count} = props;
@@ -45,6 +56,9 @@ function BurgerIngredients(props) {
                     style={{position: 'absolute', top: 9, right: 46, color: "black", fontWeight: "bold"}}>{count}</span>
             </div>
         )
+    }
+    FoodCounter.propTypes = {
+        count: PropTypes.number
     }
 
     /*картинка + описание + счетчик*/
@@ -70,7 +84,7 @@ function BurgerIngredients(props) {
                     <FoodCounter count={count}/>
                 </div>
                 <div style={{display: "flex", justifyContent: "center"}}>
-                    <text style={{marginRight: "10px"}} className={"text_type_main-default"}>{price}</text>
+                    <span style={{marginRight: "10px"}} className={"text_type_main-default"}>{price}</span>
                     <CurrencyIcon type="primary"/>
                 </div>
                 <span className={"text_type_main-default"}>{name}</span>
@@ -78,14 +92,19 @@ function BurgerIngredients(props) {
 
         );
     }
-
+    FoodContainer.propTypes = {
+        imgSrc: PropTypes.string,
+        imgAlt: PropTypes.string,
+        name: PropTypes.string,
+        price: PropTypes.number
+    }
 
     return (
-        /* Создадим контейнер, где все дети будут расположены по центру в колонку*/
+        /* Создадим контейнер, где все дети будут расположены по центру в колонку и выравнены по левую сторону*/
         <div style={{display: "flex", flexDirection: "column", alignItems: "flex-start"}}>
             <span className={"text_type_main-medium"}>Соберите бургер</span>
+            {/* Создадим контейнер, где все дети будут расположены по центру в колонку и выравнены по центру*/}
             <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
-
                 {/*Этот компонент будет использовать класс, который выравнивает компонент по центру в строке*/}
                 <div className={burgerConstructorStyles.tabClass}>
                     <Tab value="one" active={currentTab === 'one'} onClick={setCurrentTab}>
@@ -97,31 +116,30 @@ function BurgerIngredients(props) {
                     <Tab value="two" active={currentTab === 'two'} onClick={setCurrentTab}>
                         Соусы
                     </Tab>
-
                 </div>
                 {/*Это очередной компонент столбца. Он должен быть шириной 640, т.к. это ширина компонента Tab
               Длина компонента зависит от длины экрана пользователя и будет - 200px от bottom
               Используем стиль, который ограничит ширину и высоту, добавит скроллбар помимо custom-scroll,
               т.к. нужно расположить child элементы соответствующим образом
             */}
-                <div style={{maxHeight: calculateHeight(200), maxWidth: "600px", overflow: "auto"}}
+                <div style={{maxHeight: calculateHeight(250), maxWidth: "600px", overflow: "auto"}}
                      className={`custom-scroll`}>
                     {/* syling of all "in-scroll" component */}
                     <div className={burgerConstructorStyles.inTabStyle}>
                         <FoodSection sectionName="Булки">
-                            {dataStub.filter(x => x.type === "bun").map(x => <FoodContainer key={x._id} name={x.name}
-                                                                                            imgAlt={x.name}
-                                                                                            imgSrc={x.image}
-                                                                                            price={x.price}/>)}
+                            {buns.map(x => <FoodContainer key={x._id} name={x.name}
+                                                          imgAlt={x.name}
+                                                          imgSrc={x.image}
+                                                          price={x.price}/>)}
                         </FoodSection>
                         <FoodSection sectionName="Начинки">
-                            {dataStub.filter(x => x.type === "main").map(x => <FoodContainer key={x._id} name={x.name}
+                            {mains.map(x => <FoodContainer key={x._id} name={x.name}
                                                                                              imgAlt={x.name}
                                                                                              imgSrc={x.image}
                                                                                              price={x.price}/>)}
                         </FoodSection>
                         <FoodSection sectionName="Соусы">
-                            {dataStub.filter(x => x.type === "sauce").map(x => {
+                            {sauces.map(x => {
                                 return (<FoodContainer key={x._id} name={x.name} imgAlt={x.name} imgSrc={x.image}
                                                        price={x.price}/>)
                             })}
