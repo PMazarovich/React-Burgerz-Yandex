@@ -1,0 +1,73 @@
+/* ВСЁ ДЕЛАТЬ В FLEXBOXах!  https://css-tricks.com/snippets/css/a-guide-to-flexbox/
+ https://angrytools.com/css-flex/ - FLEX TUTORIAL
+ https://yandex-practicum.github.io/react-developer-burger-ui-components/docs/tab - ЯНДЕКС КОМПОНЕНТЫ
+ https://www.flaticon.com/ - ИКОНКИ
+ Размеры разных компонентов относительно друг друга можно изменять используя flexGrow: x. CМ src/components/AppHeader/header.js:9  */
+/* This style targets elements with the class "header"*/
+.header {
+    /* Uses flexbox layout to provide flexible layout options */
+    display: flex;
+    /* Horizontally centers the content within the flex container */
+    justify-content: center;
+    /* Vertically centers the content within the flex container */
+    align-items: center;
+    /* Lays out child elements in a horizontal direction */
+    flex-direction: row;
+    /* Sets the height of the container to 100% of its parent */
+    height: 100%;
+    /* Adds 15 pixels of padding to the top, right, bottom, and left edges */
+    padding: 15px;
+    /* Adds 5 pixels of space between child elements */
+    gap: 5px;
+}
+
+
+.logo {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    flex-grow: 4;
+}
+
+
+.office {
+    flex-grow: 5;
+    display: flex;
+    justify-content: left;
+}
+
+/*
+ ЭТО СТАРЫЙ ВАРИАНТ БЕЗ FLEXBOX
+.logo {
+    !* Это размеры картинки. Они принимаются во внимание, когда калькулируется center в parent компоненте*!
+    width: 290px;
+    height: 50px;
+}
+
+.feed {
+    position: absolute; !* positions it relative to the nearest positioned ancestor element, in this case the .header *!
+    left: calc(50% - 600px); !* отступаем от центра на 300 px, т.к знаем, что в центре сидит logo размером 290 (т.е. левый бок вылезает на 145px)*!
+    width: 160px;
+    height: 50px;
+    display: flex; !* it becomes a flex container *!
+    justify-content: space-between; !*Для всех child components они будут расположены равномерно по ширине по оси x *!
+    align-items: center; !*Для всех child components выравнивание вдоль оси Y будет по центру *!
+}
+
+.constructor {
+    position: absolute;
+    left: calc(50% - 800px); !* отступаем от центра на 560px, т.к знаем, что в центре сидит logo размером 290 (т.е. левый бок вылезает на 145px) и справа feed занимает 160px + 100px отступа *!
+    width: 150px;
+    height: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+.office {
+    position: absolute;
+    right: 100px;
+}
+*/
