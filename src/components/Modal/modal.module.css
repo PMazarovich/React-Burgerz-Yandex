@@ -1,0 +1,7 @@
+.clickable-div {
+    cursor: pointer;
+}
+
+.clickable-div:hover {
+    cursor: pointer;
+}

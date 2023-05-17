@@ -1,5 +1,6 @@
 /* ВСЁ ДЕЛАТЬ В FLEXBOXах!  https://css-tricks.com/snippets/css/a-guide-to-flexbox/
  https://angrytools.com/css-flex/ - FLEX TUTORIAL
+ https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Grid_Layout/Basic_Concepts_of_Grid_Layout - GRID TUTORIAL
  https://yandex-practicum.github.io/react-developer-burger-ui-components/docs/tab - ЯНДЕКС КОМПОНЕНТЫ
  https://www.flaticon.com/ - ИКОНКИ
  Размеры разных компонентов относительно друг друга можно изменять используя flexGrow: x. CМ src/components/AppHeader/header.js:9  */

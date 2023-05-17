@@ -1,8 +1,10 @@
 import React from 'react';
 import {Button, ConstructorElement, CurrencyIcon, DragIcon} from "@ya.praktikum/react-developer-burger-ui-components";
-import dataStub from "../../utils/data";
 import constructorStyles from './burger-constructor.module.css'
 import PropTypes from "prop-types";
+import ModalOverlay from "../ModalOverlay/modal-overlay";
+import Modal from "../Modal/modal";
+import OrderDetails from "../OrderDetails/order-details";
 
 
 function ScrollComponent(props) {
@@ -36,7 +38,12 @@ function ConstructorElementWrapper(props) { /*this adds DragIcon in the left of 
     )
 }
 
-function BurgerConstructor(props) {
+function BurgerConstructor({ dataFromServer }) {
+    const [sumbittedShowed, setSumbittedShowed] = React.useState(false)
+
+    function switchSumbittedShowed() {
+        setSumbittedShowed(!sumbittedShowed)
+    }
 
     return (
         <div className={constructorStyles.main}>
@@ -48,7 +55,7 @@ function BurgerConstructor(props) {
                 thumbnail={'https://code.s3.yandex.net/react/code/bun-02.png'}
             />
             <ScrollComponent distanceFromBottom={400}>
-                {dataStub.map((x, index) =>
+                {dataFromServer.map((x, index) =>
                     <ConstructorElementWrapper key={index}>
                         <ConstructorElement text={x.name} thumbnail={x.image} price={x.price}/>
                     </ConstructorElementWrapper>)}
@@ -65,10 +72,16 @@ function BurgerConstructor(props) {
                     <span style={{marginRight: "10px"}} className={"text_type_main-large"}>{12345}</span>
                     <CurrencyIcon type="primary"/>
                 </div>
-                <Button htmlType="button" type="primary" size="large">
+                <Button onClick={switchSumbittedShowed} htmlType="button" type="primary" size="large">
                     Оформить заказ
                 </Button>
             </div>
+            {sumbittedShowed &&
+                <ModalOverlay>
+                    <Modal onCloseFunction={switchSumbittedShowed} headerText={"Order confirmed!"}>
+                        <OrderDetails orderNumber={123456789}/>
+                    </Modal>
+                </ModalOverlay>}
         </div>
     )
 }
