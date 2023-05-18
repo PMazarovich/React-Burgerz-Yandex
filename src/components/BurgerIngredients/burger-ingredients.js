@@ -4,7 +4,6 @@ import burgerConstructorStyles from './burger-ingredients.module.css'
 import counterImage from '../../images/counterIcon.png'
 import PropTypes from "prop-types";
 import Modal from "../Modal/modal";
-import ModalOverlay from "../ModalOverlay/modal-overlay";
 import IngredientDetails from "../IngredientDetails/ingredient-details";
 
 
@@ -24,6 +23,10 @@ function BurgerIngredients({dataFromServer}) {
         // calculate the max scrollable height
         return window.innerHeight - distanceFromBottom
     }
+    calculateHeight.propTypes = {
+        distanceFromBottom: PropTypes.number   /* this is optional */
+    };
+
 
     function FoodSection(props) {
         const {sectionName} = props;
@@ -39,8 +42,9 @@ function BurgerIngredients({dataFromServer}) {
 
         );
     }
+
     FoodSection.propTypes = {
-        sectionName: PropTypes.string
+        sectionName: PropTypes.string.isRequired
     };
 
 
@@ -59,8 +63,9 @@ function BurgerIngredients({dataFromServer}) {
             </div>
         )
     }
+
     FoodCounter.propTypes = {
-        count: PropTypes.number
+        count: PropTypes.number.isRequired
     }
 
     /*картинка + описание + счетчик + вызов портала с описанием на правый клик*/
@@ -73,10 +78,7 @@ function BurgerIngredients({dataFromServer}) {
         }
 
         function handleRightClick(e) { /* remove an item todo changed right click. Now it will open an overlay with details */
-            /*if (count > 0) {    /!* todo where we will add this functionality? *!/
-                setCount(count - 1)
-            } */
-            switchDetailsShowed()  /* open model overlay with details */
+            setCount(count + 1)/* open model overlay with details */
             e.preventDefault() /* так отменяем открытие обычного окна при правом клике */
         }
 
@@ -84,7 +86,7 @@ function BurgerIngredients({dataFromServer}) {
 
             <>
                 <div onClick={() => {
-                    setCount(count + 1)
+                    switchDetailsShowed()
                 }} onContextMenu={handleRightClick} className={burgerConstructorStyles.foodContainerParent}>
                     <div
                         style={{position: "relative"}}>{/*parent should be relative so child can be absolute relatively to parent */}
@@ -99,12 +101,10 @@ function BurgerIngredients({dataFromServer}) {
                     <span className={"text_type_main-default"}>{name}</span>
                 </div>
                 {detailsShowed &&
-                    <ModalOverlay>
-                        <Modal onCloseFunction={switchDetailsShowed} headerText={"Ingredient details:"}>
-                            <IngredientDetails calories={calories} name={name} imgAlt={imgAlt} imgSrc={imgSrc}
-                                               proteins={proteins} carbohydrates={carbohydrates} fat={fat}/>
-                        </Modal>
-                    </ModalOverlay>}
+                    <Modal onCloseFunction={switchDetailsShowed} headerText={"Ingredient details:"}>
+                        <IngredientDetails calories={calories} name={name} imgAlt={imgAlt} imgSrc={imgSrc}
+                                           proteins={proteins} carbohydrates={carbohydrates} fat={fat}/>
+                    </Modal>}
             </>
 
 
@@ -112,22 +112,22 @@ function BurgerIngredients({dataFromServer}) {
     }
 
     FoodContainer.propTypes = {
-        imgSrc: PropTypes.string,
-        imgAlt: PropTypes.string,
-        name: PropTypes.string,
-        price: PropTypes.number,
-        proteins: PropTypes.number,
-        fat: PropTypes.number,
-        carbohydrates: PropTypes.number,
-        calories: PropTypes.number
+        imgSrc: PropTypes.string.isRequired,
+        imgAlt: PropTypes.string.isRequired,
+        name: PropTypes.string.isRequired,
+        price: PropTypes.number.isRequired,
+        proteins: PropTypes.number.isRequired,
+        fat: PropTypes.number.isRequired,
+        carbohydrates: PropTypes.number.isRequired,
+        calories: PropTypes.number.isRequired
     }
 
     return (
         /* Создадим контейнер, где все дети будут расположены по центру в колонку и выравнены по левую сторону*/
-        <div style={{display: "flex", flexDirection: "column", alignItems: "flex-start"}}>
+        <div className={burgerConstructorStyles.centerColumnLeft}>
             <span className={"text_type_main-medium"}>Соберите бургер</span>
             {/* Создадим контейнер, где все дети будут расположены по центру в колонку и выравнены по центру*/}
-            <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
+            <div className={burgerConstructorStyles.centerColumnCenter}>
                 {/*Этот компонент будет использовать класс, который выравнивает компонент по центру в строке*/}
                 <div className={burgerConstructorStyles.tabClass}>
                     <Tab value="one" active={currentTab === 'one'} onClick={setCurrentTab}>

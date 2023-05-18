@@ -5,18 +5,14 @@ import headerStyles from './header.module.css'
 function Header(props) {
     return (
         <header className={headerStyles.header}>
-            <div style={{flexGrow: "3", display: "flex", justifyContent: "flex-end"}}>
-                <div style={{display: "flex", justifyContent: "space-between"}}> {/* Конструктор */}
+            <div className={headerStyles.threeElementsInRow}>
+                <div  className={headerStyles.constructor}> {/* Конструктор */}
                     <BurgerIcon type="primary"/>
                     <p style={{marginLeft: "10px"}} className="text text_type_main-default">
                         Конструктор
                     </p>
                 </div>
-                <div style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    marginLeft: "30px"
-                }}> {/* Лента заказов */}
+                <div className={headerStyles.orderArray}> {/* Лента заказов */}
                     <ListIcon type="secondary"/>
                     <p style={{marginLeft: "10px"}} className="text text_type_main-default text_color_inactive">
                         Лента заказов

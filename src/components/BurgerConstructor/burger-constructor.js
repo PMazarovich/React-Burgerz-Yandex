@@ -2,7 +2,6 @@ import React from 'react';
 import {Button, ConstructorElement, CurrencyIcon, DragIcon} from "@ya.praktikum/react-developer-burger-ui-components";
 import constructorStyles from './burger-constructor.module.css'
 import PropTypes from "prop-types";
-import ModalOverlay from "../ModalOverlay/modal-overlay";
 import Modal from "../Modal/modal";
 import OrderDetails from "../OrderDetails/order-details";
 
@@ -24,13 +23,13 @@ function ScrollComponent(props) {
 
 }
 ScrollComponent.propTypes = {
-    distanceFromBottom: PropTypes.number
+    distanceFromBottom: PropTypes.number /* optional */
 }
 
 function ConstructorElementWrapper(props) { /*this adds DragIcon in the left of ConstructorElement*/
     return (
         <div className={constructorStyles.wrapper}>
-            <div style={{display: "flex", alignItems: "center", marginRight:"15px"}}>
+            <div className={constructorStyles.dragIconStyle}>
                 <DragIcon type="primary"/>
             </div>
             {props.children}
@@ -67,8 +66,8 @@ function BurgerConstructor({ dataFromServer }) {
                 price={200}
                 thumbnail={'https://code.s3.yandex.net/react/code/bun-02.png'}
             />
-            <div style={{display:"flex", flexDirection:"row", marginTop:"15px"}}>
-                <div style={{display:"flex", alignItems:"center", marginRight: "20px"}}>
+            <div className={constructorStyles.bottomButtonContainer}>
+                <div className={constructorStyles.currencyContainer}>
                     <span style={{marginRight: "10px"}} className={"text_type_main-large"}>{12345}</span>
                     <CurrencyIcon type="primary"/>
                 </div>
@@ -77,11 +76,9 @@ function BurgerConstructor({ dataFromServer }) {
                 </Button>
             </div>
             {sumbittedShowed &&
-                <ModalOverlay>
                     <Modal onCloseFunction={switchSumbittedShowed} headerText={"Order confirmed!"}>
                         <OrderDetails orderNumber={123456789}/>
-                    </Modal>
-                </ModalOverlay>}
+                    </Modal>}
         </div>
     )
 }

@@ -1,0 +1,18 @@
+.textDetails{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: 30px;
+}
+.centerColumn{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.bottomTextConteiner{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 700px;
+    margin-bottom: 50px;
+}
