@@ -5,7 +5,7 @@ import counterImage from '../../images/counterIcon.png'
 import PropTypes from "prop-types";
 import Modal from "../Modal/modal";
 import IngredientDetails from "../IngredientDetails/ingredient-details";
-import foodIngredientsPropTypes from "../../utils/prop-types";
+import {dataFromServerPropTypes, foodIngredientsPropTypes} from "../../utils/prop-types";
 
 
 function BurgerIngredients({dataFromServer}) {
@@ -181,8 +181,6 @@ function BurgerIngredients({dataFromServer}) {
     );
 }
 
-BurgerIngredients.propTypes = {
-    dataFromServer: PropTypes.any
-}
+BurgerIngredients.propTypes =  dataFromServerPropTypes
 
 export default BurgerIngredients;

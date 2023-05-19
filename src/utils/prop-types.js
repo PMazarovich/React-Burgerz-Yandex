@@ -1,9 +1,9 @@
 import PropTypes from "prop-types";
 
-const foodIngredientsPropTypes = {
+ export const foodIngredientsPropTypes = {
     price: PropTypes.number,        /* this is optional */
-    imgSrc: PropTypes.string.isRequired,
-    imgAlt: PropTypes.string.isRequired,
+    imgSrc: PropTypes.string,
+    imgAlt: PropTypes.string,
     name: PropTypes.string.isRequired,
     proteins: PropTypes.number.isRequired,
     fat: PropTypes.number.isRequired,
@@ -11,4 +11,6 @@ const foodIngredientsPropTypes = {
     calories: PropTypes.number.isRequired
 }
 
-export default  foodIngredientsPropTypes
+export const dataFromServerPropTypes = {
+     dataFromServer: PropTypes.arrayOf(PropTypes.shape(foodIngredientsPropTypes))
+}

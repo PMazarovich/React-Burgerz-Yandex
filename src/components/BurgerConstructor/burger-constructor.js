@@ -4,6 +4,7 @@ import constructorStyles from './burger-constructor.module.css'
 import PropTypes from "prop-types";
 import Modal from "../Modal/modal";
 import OrderDetails from "../OrderDetails/order-details";
+import {dataFromServerPropTypes} from "../../utils/prop-types";
 
 
 function ScrollComponent(props) {
@@ -86,8 +87,6 @@ function BurgerConstructor({ dataFromServer }) {
     )
 }
 
-BurgerConstructor.propTypes = {
-    dataFromServer: PropTypes.any
-}
+BurgerConstructor.propTypes = dataFromServerPropTypes
 
 export default BurgerConstructor

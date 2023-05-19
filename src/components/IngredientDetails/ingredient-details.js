@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from "prop-types";
 import ingredientDetailsStyles from './ingredient-details.module.css'
-import foodIngredientsPropTypes from '../../utils/prop-types'
+import {foodIngredientsPropTypes} from '../../utils/prop-types'
 
 function TextDetailsContainer({name, value}){
     return(

@@ -5,6 +5,7 @@ import BurgerIngredients from "./components/BurgerIngredients/burger-ingredients
 import BurgerConstructor from "./components/BurgerConstructor/burger-constructor";
 import getIngredients from './utils/burger-api';
 import appStyles from './app.module.css'
+import {dataFromServerPropTypes} from "./utils/prop-types";
 
 function BurgerIngredientsConstructorWrapper({dataFromServer}) { /* this component just adds pretty message if there is no data from server */
     if (dataFromServer != null) {
@@ -22,6 +23,8 @@ function BurgerIngredientsConstructorWrapper({dataFromServer}) { /* this compone
         )
     }
 }
+
+BurgerIngredientsConstructorWrapper.propTypes = dataFromServerPropTypes
 
 
 function App() {
