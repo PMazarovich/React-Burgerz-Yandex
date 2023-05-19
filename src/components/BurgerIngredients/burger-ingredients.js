@@ -1,10 +1,11 @@
 import React from 'react';
 import {CurrencyIcon, Tab} from "@ya.praktikum/react-developer-burger-ui-components";
-import burgerConstructorStyles from './burger-ingredients.module.css'
+import burgerIngredientsStyles from './burger-ingredients.module.css'
 import counterImage from '../../images/counterIcon.png'
 import PropTypes from "prop-types";
 import Modal from "../Modal/modal";
 import IngredientDetails from "../IngredientDetails/ingredient-details";
+import foodIngredientsPropTypes from "../../utils/prop-types";
 
 
 function BurgerIngredients({dataFromServer}) {
@@ -32,10 +33,10 @@ function BurgerIngredients({dataFromServer}) {
         const {sectionName} = props;
         return (
             <>
-                <span className={"text_type_main-medium"} style={{marginTop: "50px", marginLeft: "30px"}}>
+                <span className={`${burgerIngredientsStyles.marginTop50marginLeft30} text_type_main-medium`}>
                     {sectionName}
                 </span>
-                <div className={burgerConstructorStyles.foodSectionParent}>
+                <div className={burgerIngredientsStyles.foodSectionParent}>
                     {props.children}
                 </div>
             </>
@@ -52,14 +53,14 @@ function BurgerIngredients({dataFromServer}) {
         const {count} = props;
         return (
             /* будем скрывать счетчик если количество 0*/
-            <div hidden={count <= 0} style={{position: 'absolute', top: '0', right: '0'}}> {/* tiny image and text*/}
+            <div hidden={count <= 0} className={burgerIngredientsStyles.absoluteTop0Right0}> {/* tiny image and text*/}
                 <img
                     src={counterImage}
                     alt="Second image"
-                    style={{position: "absolute", top: 0, right: 30, maxWidth: "40px", maxHeight: "40px"}}
+                    className={burgerIngredientsStyles.absoluteTop0Right30mw40mh40}
                 />
                 <span
-                    style={{position: 'absolute', top: 9, right: 46, color: "black", fontWeight: "bold"}}>{count}</span>
+                    className={burgerIngredientsStyles.counterNumber}>{count}</span>
             </div>
         )
     }
@@ -87,15 +88,15 @@ function BurgerIngredients({dataFromServer}) {
             <>
                 <div onClick={() => {
                     switchDetailsShowed()
-                }} onContextMenu={handleRightClick} className={burgerConstructorStyles.foodContainerParent}>
+                }} onContextMenu={handleRightClick} className={burgerIngredientsStyles.foodContainerParent}>
                     <div
-                        style={{position: "relative"}}>{/*parent should be relative so child can be absolute relatively to parent */}
+                        className={burgerIngredientsStyles.relative}>{/*parent should be relative so child can be absolute relatively to parent */}
                         {/*In this div we will place the main image AND a counter image with counter inside*/}
                         <img className={'p-3'} src={imgSrc} alt={imgAlt}/> {/*main image*/}
                         <FoodCounter count={count}/>
                     </div>
-                    <div style={{display: "flex", justifyContent: "center"}}>
-                        <span style={{marginRight: "10px"}} className={"text_type_main-default"}>{price}</span>
+                    <div className={burgerIngredientsStyles.flexCenter}>
+                        <span className={`${burgerIngredientsStyles.marginRight10} text_type_main-default`}>{price}</span>
                         <CurrencyIcon type="primary"/>
                     </div>
                     <span className={"text_type_main-default"}>{name}</span>
@@ -111,25 +112,16 @@ function BurgerIngredients({dataFromServer}) {
         );
     }
 
-    FoodContainer.propTypes = {
-        imgSrc: PropTypes.string.isRequired,
-        imgAlt: PropTypes.string.isRequired,
-        name: PropTypes.string.isRequired,
-        price: PropTypes.number.isRequired,
-        proteins: PropTypes.number.isRequired,
-        fat: PropTypes.number.isRequired,
-        carbohydrates: PropTypes.number.isRequired,
-        calories: PropTypes.number.isRequired
-    }
+    FoodContainer.propTypes = foodIngredientsPropTypes
 
     return (
         /* Создадим контейнер, где все дети будут расположены по центру в колонку и выравнены по левую сторону*/
-        <div className={burgerConstructorStyles.centerColumnLeft}>
+        <div className={burgerIngredientsStyles.centerColumnLeft}>
             <span className={"text_type_main-medium"}>Соберите бургер</span>
             {/* Создадим контейнер, где все дети будут расположены по центру в колонку и выравнены по центру*/}
-            <div className={burgerConstructorStyles.centerColumnCenter}>
+            <div className={burgerIngredientsStyles.centerColumnCenter}>
                 {/*Этот компонент будет использовать класс, который выравнивает компонент по центру в строке*/}
-                <div className={burgerConstructorStyles.tabClass}>
+                <div className={burgerIngredientsStyles.tabClass}>
                     <Tab value="one" active={currentTab === 'one'} onClick={setCurrentTab}>
                         Булки
                     </Tab>
@@ -148,7 +140,7 @@ function BurgerIngredients({dataFromServer}) {
                 <div style={{maxHeight: calculateHeight(250), maxWidth: "600px", overflow: "auto"}}
                      className={`custom-scroll`}>
                     {/* syling of all "in-scroll" component */}
-                    <div className={burgerConstructorStyles.inTabStyle}>
+                    <div className={burgerIngredientsStyles.inTabStyle}>
                         <FoodSection sectionName="Булки">
                             {buns.map(x => <FoodContainer key={x._id} name={x.name}
                                                           imgAlt={x.name}
@@ -187,6 +179,10 @@ function BurgerIngredients({dataFromServer}) {
             </div>
         </div>
     );
+}
+
+BurgerIngredients.propTypes = {
+    dataFromServer: PropTypes.any
 }
 
 export default BurgerIngredients;

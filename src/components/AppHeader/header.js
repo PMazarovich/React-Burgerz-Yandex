@@ -8,13 +8,13 @@ function Header(props) {
             <div className={headerStyles.threeElementsInRow}>
                 <div  className={headerStyles.constructor}> {/* Конструктор */}
                     <BurgerIcon type="primary"/>
-                    <p style={{marginLeft: "10px"}} className="text text_type_main-default">
+                    <p className={`${headerStyles.marginLeft10} text text_type_main-default`}>
                         Конструктор
                     </p>
                 </div>
                 <div className={headerStyles.orderArray}> {/* Лента заказов */}
                     <ListIcon type="secondary"/>
-                    <p style={{marginLeft: "10px"}} className="text text_type_main-default text_color_inactive">
+                    <p  className={`${headerStyles.marginLeft10} text text_type_main-default text_color_inactive`}>
                         Лента заказов
                     </p>
                 </div>
@@ -24,7 +24,7 @@ function Header(props) {
             </div>
             <div className={headerStyles.office}>
                 <ProfileIcon type="secondary"/>
-                <p style={{marginLeft: "10px"}} className="text text_type_main-default text_color_inactive">
+                <p className={`${headerStyles.marginLeft10} text text_type_main-default text_color_inactive`}>
                     Личный кабинет
                 </p>
             </div>

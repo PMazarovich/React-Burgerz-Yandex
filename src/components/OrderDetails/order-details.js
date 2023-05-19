@@ -7,10 +7,10 @@ function OrderDetails({orderNumber}) {
     return (
         <div className={orderDetailsStyle.detailsConteiner}>
             <div className="text text_type_digits-large">{orderNumber}</div>
-            <span style={{marginTop:"30px"}} className="text text_type_main-medium">идентификатор заказа</span>
+            <span className={`${orderDetailsStyle.marginTop30} text text_type_main-medium`}>идентификатор заказа</span>
             <img src={checkboxImage} alt="checkbox" style={{width:"200px"}}/>
             <span className="text text_type_main-medium">Ваш заказ начали готовить</span>
-            <span style={{marginTop:"30px", marginBottom:"50px"}} className="text text_type_main-medium text_color_inactive">Дождитесь готовности на орбитальной станции</span>
+            <span className={`${orderDetailsStyle.marginTop30} ${orderDetailsStyle.marginBottom50} text text_type_main-medium text_color_inactive`}>Дождитесь готовности на орбитальной станции</span>
         </div>
 
     );

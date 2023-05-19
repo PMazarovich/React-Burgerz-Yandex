@@ -10,6 +10,7 @@ import ESC_KEYCODE from '../../utils/keycodes';
 
 function Modal({children, headerText, onCloseFunction}) {
     const modalRoot = document.getElementById("react-modals");
+
     function handleKeyDown(event, key) {
         // Check if the pressed key is the ESC key (key code 27)
         if (event.keyCode === key) {
@@ -29,19 +30,15 @@ function Modal({children, headerText, onCloseFunction}) {
     }, [])
 
     return ReactDOM.createPortal(
-        <div style={{ /* заполняем весь экран пользователя (это заполнение фактически в <div id="react-modals"/>) */
-            position: "relative", /* используем relative, т.к. внутри будут absolute контейнеры */
-            width: "100vw",
-            height: "100vh"
-        }}>
+        <div className={modalStyles.relativeFullscreen}>
+            {/*заполняем весь экран пользователя (это заполнение фактически в <div id="react-modals"/>)  используем relative, т.к. внутри будут absolute контейнеры*/}
             <ModalOverlay
                 onCloseFunction={onCloseFunction}/> {/* Добавляем overlay, который сделает родительский div полупрозрачным */}
             {/*2 components in column: header and children component*/}
             <div className={modalStyles.modalStyle}>
                 {/* header */}
-                <div style={{display: "grid", gridTemplateColumns: "repeat(7, 1fr)", marginTop: "15px"}}>
-                <span className={"text_type_main-medium"}
-                      style={{gridColumnStart: 2, gridColumnEnd: 5}}> {headerText} </span>
+                <div className={modalStyles.gridMain}>
+                <span className={`${modalStyles.headerGridComponent} text_type_main-medium`}> {headerText} </span>
                     {/*todo pointer does not work on X! */}
                     <div className={modalStyles.closeIcon}><CloseIcon onClick={onCloseFunction} type="primary"/></div>
                 </div>
@@ -55,6 +52,7 @@ function Modal({children, headerText, onCloseFunction}) {
         modalRoot // The node where the previous render will be rendered
     );
 }
+
 Modal.propTypes = {
     children: PropTypes.node.isRequired,
     headerText: PropTypes.string.isRequired,

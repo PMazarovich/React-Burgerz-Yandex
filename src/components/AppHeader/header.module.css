@@ -54,6 +54,10 @@
     justify-content: left;
 }
 
+.marginLeft10 {
+    margin-left: 10px;
+}
+
 /*
  ЭТО СТАРЫЙ ВАРИАНТ БЕЗ FLEXBOX
 .logo {

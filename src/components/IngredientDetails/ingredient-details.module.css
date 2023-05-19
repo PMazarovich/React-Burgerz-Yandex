@@ -16,3 +16,13 @@
     width: 700px;
     margin-bottom: 50px;
 }
+.relative{
+    position: relative;
+}
+.width500height250{
+    width: 500px;
+    height: 250px;
+}
+.marginBottom30 {
+    margin-bottom: 30px;
+}

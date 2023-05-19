@@ -6,7 +6,7 @@
     align-items: center;
 }
 
-.foodContainerParent{
+.foodContainerParent {
     /*Style for the whole FoodContainer It should be flexed and placed in columns*/
     display: flex;
     flex-direction: column;
@@ -15,13 +15,13 @@
     max-width: 200px;
 }
 
-.centerColumnLeft{
+.centerColumnLeft {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
 }
 
-.centerColumnCenter{
+.centerColumnCenter {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -53,4 +53,39 @@
     justify-content: normal;
     align-items: normal;
     align-content: normal;
+}
+
+.marginTop50marginLeft30 {
+    margin-top: 50px;
+    margin-left: 30px;
+}
+
+.absoluteTop0Right0{
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+.absoluteTop0Right30mw40mh40{
+    position: absolute;
+    top: 0;
+    right: 30px;
+    max-width: 40px;
+    max-height: 40px;
+}
+.counterNumber{
+    position: absolute;
+    top: 9px;
+    right: 46px;
+    color: black;
+    font-weight: bold;
+}
+.relative{
+    position: relative;
+}
+.flexCenter{
+    display: flex;
+    justify-content: center;
+}
+.marginRight10{
+    margin-right: 10px;
 }

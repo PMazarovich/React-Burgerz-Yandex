@@ -8,12 +8,14 @@ import OrderDetails from "../OrderDetails/order-details";
 
 function ScrollComponent(props) {
     const {distanceFromBottom = 200} = props
+
     function calculateHeight(distanceFromBottom) {
         // get the height of the screen
         // set the desired distance from the bottom
         // calculate the max scrollable height
         return window.innerHeight - distanceFromBottom
     }
+
     return (
         <div style={{maxHeight: calculateHeight(distanceFromBottom), overflow: "auto", width: "fit-content"}}
              className={`custom-scroll`}>
@@ -22,6 +24,7 @@ function ScrollComponent(props) {
     )
 
 }
+
 ScrollComponent.propTypes = {
     distanceFromBottom: PropTypes.number /* optional */
 }
@@ -68,7 +71,7 @@ function BurgerConstructor({ dataFromServer }) {
             />
             <div className={constructorStyles.bottomButtonContainer}>
                 <div className={constructorStyles.currencyContainer}>
-                    <span style={{marginRight: "10px"}} className={"text_type_main-large"}>{12345}</span>
+                    <span className={`${constructorStyles.marginRight10} text_type_main-large`}>{12345}</span>
                     <CurrencyIcon type="primary"/>
                 </div>
                 <Button onClick={switchSumbittedShowed} htmlType="button" type="primary" size="large">
@@ -76,11 +79,15 @@ function BurgerConstructor({ dataFromServer }) {
                 </Button>
             </div>
             {sumbittedShowed &&
-                    <Modal onCloseFunction={switchSumbittedShowed} headerText={"Order confirmed!"}>
-                        <OrderDetails orderNumber={123456789}/>
-                    </Modal>}
+                <Modal onCloseFunction={switchSumbittedShowed} headerText={"Order confirmed!"}>
+                    <OrderDetails orderNumber={123456789}/>
+                </Modal>}
         </div>
     )
+}
+
+BurgerConstructor.propTypes = {
+    dataFromServer: PropTypes.any
 }
 
 export default BurgerConstructor

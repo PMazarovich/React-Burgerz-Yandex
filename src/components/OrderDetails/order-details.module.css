@@ -3,3 +3,9 @@
     flex-direction: column;
     align-items: center;
 }
+.marginTop30{
+    margin-top: 30px;
+}
+.marginBottom50{
+    margin-bottom: 50px;
+}
