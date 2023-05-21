@@ -1,7 +1,9 @@
 /* ВСЁ ДЕЛАТЬ В FLEXBOXах!  https://css-tricks.com/snippets/css/a-guide-to-flexbox/
  https://angrytools.com/css-flex/ - FLEX TUTORIAL
+ https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Grid_Layout/Basic_Concepts_of_Grid_Layout - GRID TUTORIAL
  https://yandex-practicum.github.io/react-developer-burger-ui-components/docs/tab - ЯНДЕКС КОМПОНЕНТЫ
  https://www.flaticon.com/ - ИКОНКИ
+ https://medium.com/@mautayro/understanding-css-position-display-float-87f9727334b2 - POSITION DISPLAY ETC
  Размеры разных компонентов относительно друг друга можно изменять используя flexGrow: x. CМ src/components/AppHeader/header.js:9  */
 /* This style targets elements with the class "header"*/
 .header {
@@ -21,6 +23,21 @@
     gap: 5px;
 }
 
+.threeElementsInRow{
+    flex-grow: 3;
+    display: flex;
+    justify-content: flex-end;
+}
+.orderArray{
+    display: flex;
+    justify-content: space-between;
+    margin-left: 30px;
+}
+
+.constructor{
+    display: flex;
+    justify-content: space-between;
+}
 
 .logo {
     display: flex;
@@ -35,6 +52,10 @@
     flex-grow: 5;
     display: flex;
     justify-content: left;
+}
+
+.marginLeft10 {
+    margin-left: 10px;
 }
 
 /*

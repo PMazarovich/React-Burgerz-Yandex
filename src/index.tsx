@@ -5,12 +5,20 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+    document.getElementById('root') as HTMLElement
 );
 root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+    <>
+
+        <React.StrictMode>
+            {/*Корневой элемент для приложения*/}
+            <App/>
+            {/* Корневой элемент для всплывающих окон */}
+            <div id="react-modals"
+                 style={{position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}/>
+        </React.StrictMode>
+
+    </>
 );
 
 // If you want to start measuring performance in your app, pass a function

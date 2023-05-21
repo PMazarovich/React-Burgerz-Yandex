@@ -1,19 +1,21 @@
 import React from 'react';
 import {CurrencyIcon, Tab} from "@ya.praktikum/react-developer-burger-ui-components";
-import burgerConstructorStyles from './burger-ingredients.module.css'
+import burgerIngredientsStyles from './burger-ingredients.module.css'
 import counterImage from '../../images/counterIcon.png'
-import dataStub from "../../utils/data";
 import PropTypes from "prop-types";
+import Modal from "../Modal/modal";
+import IngredientDetails from "../IngredientDetails/ingredient-details";
+import {dataFromServerPropTypes, foodIngredientsPropTypes} from "../../utils/prop-types";
 
 
-// Define a functional component called MyComponent
-function BurgerIngredients(props) {
+function BurgerIngredients({dataFromServer}) {
     const [currentTab, setCurrentTab] = React.useState('one')
 
+
     /* Стараться всё, что можно делать в JS, а результаты уже рендерить в JSX */
-    const buns = dataStub.filter((item) => item.type === 'bun')
-    const mains = dataStub.filter((item) => item.type === 'main')
-    const sauces = dataStub.filter((item) => item.type === 'sauce')
+    const buns = dataFromServer.filter((item) => item.type === 'bun')
+    const mains = dataFromServer.filter((item) => item.type === 'main')
+    const sauces = dataFromServer.filter((item) => item.type === 'sauce')
 
 
     function calculateHeight(distanceFromBottom = 200) {
@@ -22,23 +24,28 @@ function BurgerIngredients(props) {
         // calculate the max scrollable height
         return window.innerHeight - distanceFromBottom
     }
+    calculateHeight.propTypes = {
+        distanceFromBottom: PropTypes.number   /* this is optional */
+    };
+
 
     function FoodSection(props) {
         const {sectionName} = props;
         return (
             <>
-                <span className={"text_type_main-medium"} style={{marginTop: "50px", marginLeft: "30px"}}>
+                <span className={`${burgerIngredientsStyles.marginTop50marginLeft30} text_type_main-medium`}>
                     {sectionName}
                 </span>
-                <div className={burgerConstructorStyles.foodSectionParent}>
+                <div className={burgerIngredientsStyles.foodSectionParent}>
                     {props.children}
                 </div>
             </>
 
         );
     }
+
     FoodSection.propTypes = {
-        sectionName: PropTypes.string
+        sectionName: PropTypes.string.isRequired
     };
 
 
@@ -46,67 +53,75 @@ function BurgerIngredients(props) {
         const {count} = props;
         return (
             /* будем скрывать счетчик если количество 0*/
-            <div hidden={count <= 0} style={{position: 'absolute', top: '0', right: '0'}}> {/* tiny image and text*/}
+            <div hidden={count <= 0} className={burgerIngredientsStyles.absoluteTop0Right0}> {/* tiny image and text*/}
                 <img
                     src={counterImage}
                     alt="Second image"
-                    style={{position: "absolute", top: 0, right: 30, maxWidth: "40px", maxHeight: "40px"}}
+                    className={burgerIngredientsStyles.absoluteTop0Right30mw40mh40}
                 />
                 <span
-                    style={{position: 'absolute', top: 9, right: 46, color: "black", fontWeight: "bold"}}>{count}</span>
+                    className={burgerIngredientsStyles.counterNumber}>{count}</span>
             </div>
         )
     }
+
     FoodCounter.propTypes = {
-        count: PropTypes.number
+        count: PropTypes.number.isRequired
     }
 
-    /*картинка + описание + счетчик*/
-    function FoodContainer(props) {
-        const {imgSrc, imgAlt, name, price} = props;
+    /*картинка + описание + счетчик + вызов портала с описанием на правый клик*/
+    function FoodContainer({imgSrc, imgAlt, name, price, proteins, fat, carbohydrates, calories}) {
         const [count, setCount] = React.useState(0)
+        const [detailsShowed, setDetailsShowed] = React.useState(false)
 
-        function handleRightClick(e) { /* remove an item */
-            if (count > 0) {
-                setCount(count - 1)
-            }
+        function switchDetailsShowed() {
+            setDetailsShowed(!detailsShowed)
+        }
+
+        function handleRightClick(e) { /* remove an item todo changed right click. Now it will open an overlay with details */
+            setCount(count + 1)/* open model overlay with details */
             e.preventDefault() /* так отменяем открытие обычного окна при правом клике */
         }
 
         return (
-            <div onClick={() => {
-                setCount(count + 1)
-            }} onContextMenu={handleRightClick} className={burgerConstructorStyles.foodContainerParent}>
-                <div
-                    style={{position: "relative"}}>{/*parent should be relative so child can be absolute relatively to parent */}
-                    {/*In this div we will place the main image AND a counter image with counter inside*/}
-                    <img className={'p-3'} src={imgSrc} alt={imgAlt}/> {/*main image*/}
-                    <FoodCounter count={count}/>
+
+            <>
+                <div onClick={() => {
+                    switchDetailsShowed()
+                }} onContextMenu={handleRightClick} className={burgerIngredientsStyles.foodContainerParent}>
+                    <div
+                        className={burgerIngredientsStyles.relative}>{/*parent should be relative so child can be absolute relatively to parent */}
+                        {/*In this div we will place the main image AND a counter image with counter inside*/}
+                        <img className={'p-3'} src={imgSrc} alt={imgAlt}/> {/*main image*/}
+                        <FoodCounter count={count}/>
+                    </div>
+                    <div className={burgerIngredientsStyles.flexCenter}>
+                        <span className={`${burgerIngredientsStyles.marginRight10} text_type_main-default`}>{price}</span>
+                        <CurrencyIcon type="primary"/>
+                    </div>
+                    <span className={"text_type_main-default"}>{name}</span>
                 </div>
-                <div style={{display: "flex", justifyContent: "center"}}>
-                    <span style={{marginRight: "10px"}} className={"text_type_main-default"}>{price}</span>
-                    <CurrencyIcon type="primary"/>
-                </div>
-                <span className={"text_type_main-default"}>{name}</span>
-            </div>
+                {detailsShowed &&
+                    <Modal onCloseFunction={switchDetailsShowed} headerText={"Ingredient details:"}>
+                        <IngredientDetails calories={calories} name={name} imgAlt={imgAlt} imgSrc={imgSrc}
+                                           proteins={proteins} carbohydrates={carbohydrates} fat={fat}/>
+                    </Modal>}
+            </>
+
 
         );
     }
-    FoodContainer.propTypes = {
-        imgSrc: PropTypes.string,
-        imgAlt: PropTypes.string,
-        name: PropTypes.string,
-        price: PropTypes.number
-    }
+
+    FoodContainer.propTypes = foodIngredientsPropTypes
 
     return (
         /* Создадим контейнер, где все дети будут расположены по центру в колонку и выравнены по левую сторону*/
-        <div style={{display: "flex", flexDirection: "column", alignItems: "flex-start"}}>
+        <div className={burgerIngredientsStyles.centerColumnLeft}>
             <span className={"text_type_main-medium"}>Соберите бургер</span>
             {/* Создадим контейнер, где все дети будут расположены по центру в колонку и выравнены по центру*/}
-            <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
+            <div className={burgerIngredientsStyles.centerColumnCenter}>
                 {/*Этот компонент будет использовать класс, который выравнивает компонент по центру в строке*/}
-                <div className={burgerConstructorStyles.tabClass}>
+                <div className={burgerIngredientsStyles.tabClass}>
                     <Tab value="one" active={currentTab === 'one'} onClick={setCurrentTab}>
                         Булки
                     </Tab>
@@ -125,23 +140,38 @@ function BurgerIngredients(props) {
                 <div style={{maxHeight: calculateHeight(250), maxWidth: "600px", overflow: "auto"}}
                      className={`custom-scroll`}>
                     {/* syling of all "in-scroll" component */}
-                    <div className={burgerConstructorStyles.inTabStyle}>
+                    <div className={burgerIngredientsStyles.inTabStyle}>
                         <FoodSection sectionName="Булки">
                             {buns.map(x => <FoodContainer key={x._id} name={x.name}
                                                           imgAlt={x.name}
                                                           imgSrc={x.image}
-                                                          price={x.price}/>)}
+                                                          price={x.price}
+                                                          calories={x.calories}
+                                                          fat={x.fat}
+                                                          carbohydrates={x.carbohydrates}
+                                                          proteins={x.proteins}/>)}
                         </FoodSection>
                         <FoodSection sectionName="Начинки">
                             {mains.map(x => <FoodContainer key={x._id} name={x.name}
-                                                                                             imgAlt={x.name}
-                                                                                             imgSrc={x.image}
-                                                                                             price={x.price}/>)}
+                                                           imgAlt={x.name}
+                                                           imgSrc={x.image}
+                                                           price={x.price}
+                                                           calories={x.calories}
+                                                           fat={x.fat}
+                                                           carbohydrates={x.carbohydrates}
+                                                           proteins={x.proteins}/>)}
                         </FoodSection>
                         <FoodSection sectionName="Соусы">
                             {sauces.map(x => {
-                                return (<FoodContainer key={x._id} name={x.name} imgAlt={x.name} imgSrc={x.image}
-                                                       price={x.price}/>)
+                                return (<FoodContainer key={x._id}
+                                                       name={x.name}
+                                                       imgAlt={x.name}
+                                                       imgSrc={x.image}
+                                                       price={x.price}
+                                                       calories={x.calories}
+                                                       fat={x.fat}
+                                                       carbohydrates={x.carbohydrates}
+                                                       proteins={x.proteins}/>)
                             })}
                         </FoodSection>
                     </div>
@@ -150,5 +180,7 @@ function BurgerIngredients(props) {
         </div>
     );
 }
+
+BurgerIngredients.propTypes =  dataFromServerPropTypes
 
 export default BurgerIngredients;

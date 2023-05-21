@@ -12,3 +12,23 @@
     margin-bottom: 15px;
     margin-right: 15px;
 }
+.dragIconStyle{
+    display: flex;
+    align-items: center;
+    margin-right: 15px;
+}
+.bottomButtonContainer{
+    display: flex;
+    flex-direction: row;
+    margin-top: 15px;
+}
+
+.currencyContainer{
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+}
+
+.marginRight10{
+    margin-right: 10px;
+}
