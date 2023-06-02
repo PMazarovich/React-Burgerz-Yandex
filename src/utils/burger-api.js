@@ -26,4 +26,19 @@ async function getIngredients() { /* This returns Ingredients data OR throws an 
     return extractedJson.data
 }
 
-export default getIngredients
+
+async function postOrder(order) { /* This returns order number OR throws an error */
+    const response = await fetch(`${NORMA_API}/orders`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({"ingredients": order})
+    });
+    // noinspection UnnecessaryLocalVariableJS
+    let extractedJson = await parseJsonFromResponse(checkReponseStatusCode(response))
+    return extractedJson
+}
+
+export {postOrder, getIngredients}
+

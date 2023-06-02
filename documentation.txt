@@ -6,3 +6,5 @@ https://yandex-practicum.github.io/react-developer-burger-ui-components/docs/tab
 https://www.flaticon.com/ - ИКОНКИ
 https://medium.com/@mautayro/understanding-css-position-display-float-87f9727334b2 - POSITION DISPLAY ETC
 
+DEBUG - run Debug and then ctrl+shift and go to Local:  http://localhost:3000   in Process console
+

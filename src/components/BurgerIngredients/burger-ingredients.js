@@ -1,21 +1,22 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {CurrencyIcon, Tab} from "@ya.praktikum/react-developer-burger-ui-components";
 import burgerIngredientsStyles from './burger-ingredients.module.css'
 import counterImage from '../../images/counterIcon.png'
 import PropTypes from "prop-types";
 import Modal from "../Modal/modal";
 import IngredientDetails from "../IngredientDetails/ingredient-details";
-import {dataFromServerPropTypes, foodIngredientsPropTypes} from "../../utils/prop-types";
+import {foodIngredientsPropTypes} from "../../utils/prop-types";
+import {CommonDataFromServerContext} from "../../utils/common-data-from-server-context";
 
 
-function BurgerIngredients({dataFromServer}) {
+function BurgerIngredients() {
     const [currentTab, setCurrentTab] = React.useState('one')
-
+    const burgerConstructorState = useContext(CommonDataFromServerContext); // тащим burgerConstructorState из контекста
 
     /* Стараться всё, что можно делать в JS, а результаты уже рендерить в JSX */
-    const buns = dataFromServer.filter((item) => item.type === 'bun')
-    const mains = dataFromServer.filter((item) => item.type === 'main')
-    const sauces = dataFromServer.filter((item) => item.type === 'sauce')
+    const buns = burgerConstructorState.filter((item) => item.type === 'bun')
+    const mains = burgerConstructorState.filter((item) => item.type === 'main')
+    const sauces = burgerConstructorState.filter((item) => item.type === 'sauce')
 
 
     function calculateHeight(distanceFromBottom = 200) {
@@ -56,7 +57,7 @@ function BurgerIngredients({dataFromServer}) {
             <div hidden={count <= 0} className={burgerIngredientsStyles.absoluteTop0Right0}> {/* tiny image and text*/}
                 <img
                     src={counterImage}
-                    alt="Second image"
+                    alt="Second"
                     className={burgerIngredientsStyles.absoluteTop0Right30mw40mh40}
                 />
                 <span
@@ -180,7 +181,5 @@ function BurgerIngredients({dataFromServer}) {
         </div>
     );
 }
-
-BurgerIngredients.propTypes =  dataFromServerPropTypes
 
 export default BurgerIngredients;
