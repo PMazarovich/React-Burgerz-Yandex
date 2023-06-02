@@ -46,7 +46,7 @@ function BurgerConstructor() {
     const [sumbittedShowed, setSumbittedShowed] = React.useState(false)
     // eslint-disable-next-line no-unused-vars
     const [burgerConstructorState, dispatchBurgerConstructorState] = useContext(BurgerConstructorContext); // тащим данные из контекста
-    // dispatchBurgerConstructorState - это функция отправки сообщения в Reducer, его тут использовать не будем, просто лдя примера оставляю
+    // dispatchBurgerConstructorState - это функция отправки сообщения в Reducer
     const [orderNumber, setOrderNumber] = React.useState(null)
 
     function submitAnOrder() {
@@ -73,6 +73,13 @@ function BurgerConstructor() {
         setSumbittedShowed(!sumbittedShowed)
     }
 
+    function removeIngredient(ingredient){
+        dispatchBurgerConstructorState({
+            type: "removeIngredient",
+            ingredient: ingredient
+        })
+    }
+
     // filter Bun here as this is an exceptional element.
     // todo restict picking more than 1 bun and force to pick at least 1 bun
     //  This will happen in BurgerIngredients most probably.
@@ -84,6 +91,9 @@ function BurgerConstructor() {
             price: 200,
             image: 'https://code.s3.yandex.net/react/code/bun-02.png'
         };
+
+    let ingredientsWithoutBun = burgerConstructorState.currentIngredients.filter(ingredient => ingredient.type !== "bun")
+
     return (
         <div className={constructorStyles.main}>
             <ConstructorElement
@@ -95,14 +105,11 @@ function BurgerConstructor() {
             />
             <ScrollComponent distanceFromBottom={400}>
                 {/* filter out "bun" and fill the ingredients with regular ones */}
-                {burgerConstructorState.currentIngredients.filter(x => x.type !== "bun").map((x, index) =>
+                {ingredientsWithoutBun.map((ingredient, index) =>
                     <ConstructorElementWrapper
                         key={index}> {/* we can't use x._id here as there might be multiple identical ingredients */}
-                        <ConstructorElement text={x.name} thumbnail={x.image} price={x.price}
-                                            handleClose={() => dispatchBurgerConstructorState({
-                                                type: "removeIngredient",
-                                                ingredient: x
-                                            })}/>
+                        <ConstructorElement text={ingredient.name} thumbnail={ingredient.image} price={ingredient.price}
+                                            handleClose={() => removeIngredient(ingredient)}/>
                     </ConstructorElementWrapper>)}
             </ScrollComponent>
             <ConstructorElement
