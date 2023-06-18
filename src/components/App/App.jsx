@@ -1,11 +1,11 @@
 import React, {useState} from 'react';
 import './App.css';
-import Header from "./components/AppHeader/header";
-import {getIngredients} from './utils/burger-api';
+import Header from "../AppHeader/header";
+import {getIngredients} from '../../utils/burger-api';
 import BurgerIngredientsConstructorWrapper
-    from "./components/BurgerIngredientsConstructorWrapper/burger-ingredients-constructor-wrapper";
+    from "../BurgerIngredientsConstructorWrapper/burger-ingredients-constructor-wrapper";
 import {useDispatch} from "react-redux";
-import {ingredientsActions} from "./store/reducers/IngredientsListSlice";
+import {ingredientsActions} from "../../store/reducers/IngredientsListSlice";
 
 function App() {
     const dispatch = useDispatch()

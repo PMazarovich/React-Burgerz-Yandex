@@ -8,10 +8,9 @@ import IngredientDetails from "../IngredientDetails/ingredient-details";
 import {foodIngredientsPropTypes} from "../../utils/prop-types";
 import {useDispatch, useSelector} from "react-redux";
 import {useDrag} from "react-dnd";
-import {constructorActions} from "../../store/reducers/BurgerConstructorSlice";
 
 
-function BurgerIngredients() {
+function BurgerIngredients({ingredientDragging,setIngredientDragging}) {
     const [currentTab, setCurrentTab] = React.useState('one')
     // if there will be more tabs, then we'll think how to create a generic code
     const tabsRef = useRef(null);
@@ -109,7 +108,7 @@ function BurgerIngredients() {
             item: {
                 ingredientId // Мы хотим передать в редюсер конструктора ТОЛЬКО id того элемента, который перетащили
             },
-            end: () => dispatch(constructorActions.dragStopped()), // end fires when drag is over
+            end: () => setIngredientDragging(false), //dispatch(constructorActions.dragStopped()), // end fires when drag is over
             collect: monitor => ({
                 isDrag: monitor.isDragging(),
             })
@@ -118,7 +117,8 @@ function BurgerIngredients() {
         // Send a message to the reducer, that we began to drag an item
         useEffect(() => {
             if (isDrag) {
-                dispatch(constructorActions.dragStarted())
+                //dispatch(constructorActions.dragStarted())
+                setIngredientDragging(true)
             }
         }, [isDrag]);
 

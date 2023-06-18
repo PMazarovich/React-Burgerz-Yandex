@@ -18,9 +18,9 @@ export const submitAnOrderSlice = createSlice(
             sendAnOrder(state){
                 state.fetching = true
             },
-            orderConfirmed(state, payload){
+            orderConfirmed(state, action){
                 state.fetching = false
-                state.orderNumber = payload.orderNumber
+                state.orderNumber = action.payload.orderNumber
                 state.error = ''
             },
             orderFailed(state, payload){

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import BurgerIngredients from "../BurgerIngredients/burger-ingredients";
 import BurgerConstructor from "../BurgerConstructor/burger-constructor";
 import bcwStyles from './burger-ingredients-constructor-wrapper.module.css'
@@ -12,6 +12,7 @@ function BurgerIngredientsConstructorWrapper() { /* this component just adds a p
         fetching: state.ingredientsState.ingredientsFetching,
         error: state.ingredientsState.error,
     }));
+    const [ingredientDragging, setIngredientDragging] = useState(false) // состояние dragging вынесено сюда, т.к. для redux это избыточная информация
     if (fetching) {
         console.log("fetching....")
         return <div>Fetching data...</div>
@@ -20,8 +21,8 @@ function BurgerIngredientsConstructorWrapper() { /* this component just adds a p
             // <div>MAIN</div>
             <DndProvider backend={HTML5Backend}>
                 <div className={bcwStyles.twoRowedElements}>
-                    <BurgerIngredients/>
-                    <BurgerConstructor/>
+                    <BurgerIngredients ingredientDragging={ingredientDragging} setIngredientDragging={setIngredientDragging}/>
+                    <BurgerConstructor ingredientDragging={ingredientDragging} setIngredientDragging={setIngredientDragging}/>
                 </div>
             </DndProvider>
         )

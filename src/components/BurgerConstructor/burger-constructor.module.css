@@ -32,3 +32,16 @@
 .marginRight10{
     margin-right: 10px;
 }
+.scroll{
+    min-height: 200px;
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+}
+.border{
+  border: 1px dashed lightblue;
+}
+.fullWidthHeight{
+    width: 100%;
+    height: 100%;
+}

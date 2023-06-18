@@ -9,15 +9,18 @@ import {useDispatch, useSelector} from "react-redux";
 import {constructorActions} from "../../store/reducers/BurgerConstructorSlice";
 import {submitAnOrderActions} from "../../store/reducers/SubmitAnOrderSlice";
 import {useDrop} from "react-dnd";
+import classNames from 'classnames';
 
-function restoreIngredientById(ingredientList, ingredientId){
+function restoreIngredientById(ingredientList, ingredientId) {
     return ingredientList.filter(originalIngredient => originalIngredient._id === ingredientId)[0] // we know that ids are unique, so we can get [0]
 }
+
 // В этот компонент будем тащить <FoodContainer>
 // В этом компоненте будем дополнять список через constructorActions.addIngredient({ingredient: ingredientDropped})
 function ScrollComponent(props) {
-    const { dragStarted = false, originalIngredients } = useSelector(store => ({
-        dragStarted: store.constructorState.dragging,
+    const {ingredientDragging, setIngredientDragging} = props
+    const { /*dragStarted = false,*/ originalIngredients} = useSelector(store => ({
+        //dragStarted: store.constructorState.dragging,
         originalIngredients: store.ingredientsState.ingredients,
     }))
     const dispatch = useDispatch()
@@ -26,12 +29,12 @@ function ScrollComponent(props) {
     const [, dropFoodContainerTarget] = useDrop({ // принимаем ID ингредиента из FoodContainer
         accept: ["abstractIngredient"],
         drop(ingredientId) { //  Это объект пришедший из FoodContainer. D частности у него есть поле ingredientId
-            console.log(ingredientId)
-            dispatch(constructorActions.dragStopped())
+            setIngredientDragging(false)
+            //dispatch(constructorActions.dragStopped())
             restoreIngredientById(originalIngredients, ingredientId.ingredientId)
             // отфильтровываем булки от остальных ингредиентов
-            if (restoreIngredientById(originalIngredients, ingredientId.ingredientId).type !== "bun"){
-                dispatch(constructorActions.addIngredient(ingredientId))
+            if (restoreIngredientById(originalIngredients, ingredientId.ingredientId).type !== "bun") {
+                dispatch(constructorActions.addIngredient({payload: ingredientId})) // ВСЕГДА ДЕЛАТЬ ТАК - {payload: ....}
             } else {
                 dispatch(constructorActions.addBun(ingredientId))
             }
@@ -45,13 +48,6 @@ function ScrollComponent(props) {
             dispatch(constructorActions.dragStopped())
         },
     })
-    // change a color of the border basing on the changes of dragStarted
-    let borderStyle = ''
-    if (dragStarted) {
-        borderStyle = 'dashed lightblue'
-    } else {
-        borderStyle = 'transparent'
-    }
 
     function calculateHeight(distanceFromBottom) {
         // get the height of the screen
@@ -59,20 +55,19 @@ function ScrollComponent(props) {
         // calculate the max scrollable height
         return window.innerHeight - distanceFromBottom
     }
-
+    // ВНИМАНИЕ. КЛАССЫ КОМПОНОВАТЬ ВСЕГДА ТАК.
+    const scrollClassNames = classNames('custom-scroll', constructorStyles.scroll,  // <- эти классы в любом случае применятся
+        {
+            [constructorStyles.border]: ingredientDragging, // Если ingredientDragging - true применить еще и style border
+        });
     return (
         /* this is a div just to handle reordering components */
-        <div style={{height: "100%", width: "100%",}} ref={dropConstructorElementWrapperTarget}>
+        <div className={constructorStyles.fullWidthHeight} ref={dropConstructorElementWrapperTarget}>
             <div ref={dropFoodContainerTarget}
                  style={{
                      maxHeight: calculateHeight(distanceFromBottom),
-                     border: `1px ${borderStyle}`,
-                     minHeight: "200px",
-                     height: "100%",
-                     width: "100%",
-                     overflow: "auto",
                  }}
-                 className={`custom-scroll`}
+                 className={scrollClassNames}
             >
                 {props.children}
             </div>
@@ -98,7 +93,7 @@ function ConstructorElementWrapper(props) { /*this adds DragIcon in the left of 
     )
 }
 
-function BurgerConstructor() {
+function BurgerConstructor({ingredientDragging, setIngredientDragging}) {
     const dispatch = useDispatch()
     const [submittedShowed, setSubmittedShowed] = React.useState(false)
     const {currentIngredientsUUIdsIds, originalIngredients, orderNumber, bunIngredientId} = useSelector(store => ({
@@ -110,17 +105,22 @@ function BurgerConstructor() {
 
     // Восстановим ингредиенты для отрисовки в Constructor исходя из тех ingredientId, которые в данный момент в constructorStore
     let currentIngredients = []
-    if (currentIngredientsUUIdsIds.length !== 0){
+    if (currentIngredientsUUIdsIds.length !== 0) {
         // iterate over all currentIngredientsUUIdsIds and resurrect ingredients in constructor based on current ingredients id and original ingredients
         for (let ingredientUuidId of currentIngredientsUUIdsIds) {
             // add a uuid for each resurrected ingredient, just to be able to remove it properly later
-            currentIngredients.push({...restoreIngredientById(originalIngredients,ingredientUuidId.ingredientId), uuid: ingredientUuidId.uuid})
+            currentIngredients.push({
+                ...restoreIngredientById(originalIngredients, ingredientUuidId.ingredientId),
+                uuid: ingredientUuidId.uuid
+            })
         }
     }
 
     function submitAnOrder() {
         // готовим request
-        let ids = currentIngredients.flatMap(x => x._id)
+        let ids = [bunIngredientId] // first and last ingredient Id should be buns. Order is important for sending to the server
+        ids = ids.concat(currentIngredientsUUIdsIds.flatMap(x => x.ingredientId))
+        ids.push(bunIngredientId)
         // Если успех, покажем modal с order. Если успеха нет, выдаем alert с ошибкой
         dispatch(submitAnOrderActions.sendAnOrder())
         postOrder(ids).then(x => {
@@ -153,7 +153,7 @@ function BurgerConstructor() {
     currentIngredients.forEach(ingredient => {
         summ = summ + ingredient.price
     });
-    summ = summ + chosenBun.price*2
+    summ = summ + chosenBun.price * 2
 
     let ingredientsWithoutBun = currentIngredients.filter(ingredient => ingredient.type !== "bun")
 
@@ -162,25 +162,27 @@ function BurgerConstructor() {
             <ConstructorElement
                 type="top"
                 isLocked={true}
-                text={chosenBun.name}
+                text={chosenBun.name + " (верх)"}
                 price={chosenBun.price}
                 thumbnail={chosenBun.image}
             />
-            <ScrollComponent distanceFromBottom={400}>
+            <ScrollComponent distanceFromBottom={400} ingredientDragging={ingredientDragging}
+                             setIngredientDragging={setIngredientDragging}>
                 {/* filter out "bun" and fill the ingredients with regular ones */}
                 {ingredientsWithoutBun.map((ingredient) =>
                     /* we need a customKey as we can't access a key property of component from the component */
-                    <ConstructorElementWrapper customKey={ingredient.uuid} key={ingredient.uuid}> {/* we can't use x._id here as there might be multiple identical ingredients */}
+                    <ConstructorElementWrapper customKey={ingredient.uuid}
+                                               key={ingredient.uuid}> {/* we can't use x._id here as there might be multiple identical ingredients */}
                         <ConstructorElement text={ingredient.name} thumbnail={ingredient.image}
                                             price={ingredient.price}
-                                            handleClose={() => dispatch(constructorActions.removeIngredient({ingredientUuid: ingredient.uuid}))}/>{/*Удаляем по uuid*/}
+                                            handleClose={() => dispatch(constructorActions.removeIngredient(ingredient.uuid))}/>{/*Удаляем по uuid*/}
 
                     </ConstructorElementWrapper>)}
             </ScrollComponent>
             <ConstructorElement
                 type="bottom"
                 isLocked={true}
-                text={chosenBun.name}
+                text={chosenBun.name + " (низ)"}
                 price={chosenBun.price}
                 thumbnail={chosenBun.image}
             />
