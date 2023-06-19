@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {Button, ConstructorElement, CurrencyIcon, DragIcon} from "@ya.praktikum/react-developer-burger-ui-components";
 import constructorStyles from './burger-constructor.module.css'
 import PropTypes from "prop-types";
@@ -8,8 +8,10 @@ import {postOrder} from '../../utils/burger-api'
 import {useDispatch, useSelector} from "react-redux";
 import {constructorActions} from "../../store/reducers/BurgerConstructorSlice";
 import {submitAnOrderActions} from "../../store/reducers/SubmitAnOrderSlice";
-import {useDrop} from "react-dnd";
+import {useDrag, useDrop} from "react-dnd";
 import classNames from 'classnames';
+//---this is for inner sorting--------//
+import update from "immutability-helper";
 
 function restoreIngredientById(ingredientList, ingredientId) {
     return ingredientList.filter(originalIngredient => originalIngredient._id === ingredientId)[0] // we know that ids are unique, so we can get [0]
@@ -41,13 +43,6 @@ function ScrollComponent(props) {
 
         }
     })
-    // todo это не сделано.
-    const [, dropConstructorElementWrapperTarget] = useDrop({ // принимаем элементы из ConstructorElementWrapper (reorder)
-        accept: ["reorderedIngredient"], // принимаем элементы из ConstructorElementWrapper
-        drop() {
-            dispatch(constructorActions.dragStopped())
-        },
-    })
 
     function calculateHeight(distanceFromBottom) {
         // get the height of the screen
@@ -62,7 +57,7 @@ function ScrollComponent(props) {
         });
     return (
         /* this is a div just to handle reordering components */
-        <div className={constructorStyles.fullWidthHeight} ref={dropConstructorElementWrapperTarget}>
+        <div className={constructorStyles.fullWidthHeight}>
             <div ref={dropFoodContainerTarget}
                  style={{
                      maxHeight: calculateHeight(distanceFromBottom),
@@ -83,8 +78,67 @@ ScrollComponent.propTypes = {
 // This element is draggable within ScrollComponent
 // customKey is available here. customKey here is from 0 to N. This customKey is n actual order in constructorState.ingredients
 function ConstructorElementWrapper(props) { /*this adds DragIcon in the left of ConstructorElement*/
+    const { index, moveIng, customKey } = props
+    /*-----------------InnerSort----на это внимания не обращаем-----------*/
+    const ref = useRef(null)
+    const [{ handlerId }, drop] = useDrop({
+        accept: 'ing',
+        collect(monitor) {
+            return {
+                handlerId: monitor.getHandlerId(),
+            }
+        },
+        hover(item, monitor) {
+            if (!ref.current) {
+                return
+            }
+            const dragIndex = item.index
+            const hoverIndex = index
+            // Don't replace items with themselves
+            if (dragIndex === hoverIndex) {
+                return
+            }
+            // Determine rectangle on screen
+            const hoverBoundingRect = ref.current?.getBoundingClientRect()
+            // Get vertical middle
+            const hoverMiddleY =
+                (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2
+            // Determine mouse position
+            const clientOffset = monitor.getClientOffset()
+            // Get pixels to the top
+            const hoverClientY = clientOffset.y - hoverBoundingRect.top
+            // Only perform the move when the mouse has crossed half of the items height
+            // When dragging downwards, only move when the cursor is below 50%
+            // When dragging upwards, only move when the cursor is above 50%
+            // Dragging downwards
+            if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
+                return
+            }
+            // Dragging upwards
+            if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
+                return
+            }
+            // Time to actually perform the action
+            moveIng(dragIndex, hoverIndex)
+            // Note: we're mutating the monitor item here!
+            // Generally it's better to avoid mutations,
+            // but it's good here for the sake of performance
+            // to avoid expensive index searches.
+            item.index = hoverIndex
+        },
+    })
+    const [{ isDragging }, drag] = useDrag({
+        type: 'ing',
+        item: () => {
+            return { customKey, index }
+        },
+        collect: (monitor) => ({
+            isDragging: monitor.isDragging(),
+        }),
+    })
+    drag(drop(ref))
     return (
-        <div className={constructorStyles.wrapper}>
+        <div ref={ref} data-handler-id={handlerId} className={constructorStyles.wrapper}>
             <div className={constructorStyles.dragIconStyle}>
                 <DragIcon type="primary"/>
             </div>
@@ -155,7 +209,26 @@ function BurgerConstructor({ingredientDragging, setIngredientDragging}) {
     });
     summ = summ + chosenBun.price * 2
 
-    let ingredientsWithoutBun = currentIngredients.filter(ingredient => ingredient.type !== "bun")
+    //----------------------InnerSort---------на это внимательно можно не смотреть, т.к. скопировано отсюда почти полностью https://react-dnd.github.io/react-dnd/examples/sortable/simple-----------//;
+    const [currentIngredientsOrderableState, setCurrentIngredientsOrderableState] = useState(currentIngredients)
+    useEffect(() => {    // ОБРАТИТЬ ВНИМАНИЕ - ЭТО ОЧЕНЬ ПОЛЕЗНЫЙ ИНСТРУМЕНТ ПРОТИВ БЕСКОНЕЧНЫХ РЕРЕНДЕРОВ. ДЕЛАЕМ SETSTATE ТОЛЬКО ПО УСЛОВИЮ
+        if (currentIngredientsOrderableState.length !== currentIngredients.length){
+            setCurrentIngredientsOrderableState(currentIngredients);
+        }
+    }, [currentIngredients, currentIngredientsOrderableState]);
+
+    const moveIng = useCallback((dragIndex, hoverIndex) => {
+        setCurrentIngredientsOrderableState((prevIngs) =>
+            update(prevIngs, {
+                $splice: [
+                    [dragIndex, 1],
+                    [hoverIndex, 0, prevIngs[dragIndex]]
+                ]
+            })
+        );
+    }, []);
+
+    /*--------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
     return (
         <div className={constructorStyles.main}>
@@ -169,10 +242,12 @@ function BurgerConstructor({ingredientDragging, setIngredientDragging}) {
             <ScrollComponent distanceFromBottom={400} ingredientDragging={ingredientDragging}
                              setIngredientDragging={setIngredientDragging}>
                 {/* filter out "bun" and fill the ingredients with regular ones */}
-                {ingredientsWithoutBun.map((ingredient) =>
+                {currentIngredientsOrderableState.map((ingredient, index) =>
                     /* we need a customKey as we can't access a key property of component from the component */
                     <ConstructorElementWrapper customKey={ingredient.uuid}
-                                               key={ingredient.uuid}> {/* we can't use x._id here as there might be multiple identical ingredients */}
+                                               key={ingredient.uuid}
+                                               index={index}
+                                               moveIng={moveIng}                 > {/* we can't use x._id here as there might be multiple identical ingredients */}
                         <ConstructorElement text={ingredient.name} thumbnail={ingredient.image}
                                             price={ingredient.price}
                                             handleClose={() => dispatch(constructorActions.removeIngredient(ingredient.uuid))}/>{/*Удаляем по uuid*/}

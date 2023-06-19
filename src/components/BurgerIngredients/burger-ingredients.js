@@ -10,7 +10,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {useDrag} from "react-dnd";
 
 
-function BurgerIngredients({ingredientDragging,setIngredientDragging}) {
+function BurgerIngredients({setIngredientDragging}) {
     const [currentTab, setCurrentTab] = React.useState('one')
     // if there will be more tabs, then we'll think how to create a generic code
     const tabsRef = useRef(null);

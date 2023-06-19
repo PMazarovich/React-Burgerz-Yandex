@@ -14,7 +14,6 @@ function BurgerIngredientsConstructorWrapper() { /* this component just adds a p
     }));
     const [ingredientDragging, setIngredientDragging] = useState(false) // состояние dragging вынесено сюда, т.к. для redux это избыточная информация
     if (fetching) {
-        console.log("fetching....")
         return <div>Fetching data...</div>
     } else if (!fetching && ingredients !== []) {
         return (
