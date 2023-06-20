@@ -1,23 +1,26 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import App from './App';
+import App from './components/App/App';
 import reportWebVitals from './reportWebVitals';
+import {Provider} from "react-redux";
+import {store} from "./store/store";
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
 );
+
 root.render(
     <>
-
         <React.StrictMode>
-            {/*Корневой элемент для приложения*/}
-            <App/>
-            {/* Корневой элемент для всплывающих окон */}
-            <div id="react-modals"
-                 style={{position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}/>
+            <Provider store={store}> {/* это провайдер redux для всего приложения */}
+                {/*Корневой элемент для приложения*/}
+                <App/>
+                {/* Корневой элемент для всплывающих окон */}
+                <div id="react-modals"
+                     style={{position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}/>
+            </Provider>
         </React.StrictMode>
-
     </>
 );
 

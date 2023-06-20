@@ -8,3 +8,19 @@ https://medium.com/@mautayro/understanding-css-position-display-float-87f9727334
 
 DEBUG - run Debug and then ctrl+shift and go to Local:  http://localhost:3000   in Process console
 
+Для того, чтобы удобно представлять классы, нужно использовать библиотеку classnames
+const scrollClassNames = classNames('custom-scroll', constructorStyles.scroll,  // <- эти классы в любом случае применятся
+        {
+            [constructorStyles.border]: ingredientDragging, // Если ingredientDragging - true применить еще и style border
+        });
+    return (
+        <div className={constructorStyles.fullWidthHeight} ref={dropConstructorElementWrapperTarget}>
+            <div ref={dropFoodContainerTarget}
+                 style={{
+                     maxHeight: calculateHeight(distanceFromBottom),
+                 }}
+                 className={scrollClassNames}
+            >
+                {props.children}
+            </div>
+        </div>
