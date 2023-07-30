@@ -5,7 +5,7 @@
     max-width: 536px;
     margin-top: 60px;
 }
-.wrapper{
+.gridWrapper{
     display: flex;
     flex-direction: row;
     margin-top: 15px;

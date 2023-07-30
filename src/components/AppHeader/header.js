@@ -1,34 +1,45 @@
 import React from 'react';
 import {BurgerIcon, ListIcon, Logo, ProfileIcon} from '@ya.praktikum/react-developer-burger-ui-components'
 import headerStyles from './header.module.css'
+import {NavLink} from "react-router-dom";
 
 function Header() {
     return (
         <header className={headerStyles.header}>
-            <div className={headerStyles.threeElementsInRow}>
-                <a href={''} className={headerStyles.constructor}> {/* Конструктор */}
+            <div className={headerStyles.flexRowCenter}>
+                <div className={headerStyles.flexRowCenter}>
                     <BurgerIcon type="primary"/>
-                    <p className={`${headerStyles.marginLeft10} text text_type_main-default`}>
+                    <NavLink to="/constructor"
+                             style={{textDecoration: 'none'}}
+                             className={nav => (nav.isActive ? `${headerStyles.marginLeft10} text text_type_main-default` : `${headerStyles.marginLeft10} text text_type_main-default text_color_inactive`)}>
                         Конструктор
-                    </p>
-                </a>
-                <a href={''} className={headerStyles.orderArray}> {/* Лента заказов */}
-                    <ListIcon type="secondary"/>
-                    <p  className={`${headerStyles.marginLeft10} text text_type_main-default text_color_inactive`}>
+                    </NavLink>
+                </div>
+                <div style={{display: 'flex', flexDirection: 'row'}}>
+                    <div style={{marginLeft: '70px'}}><ListIcon type="secondary"/></div>
+                    <NavLink
+                        to={`/ordersLine`}
+                        style={{textDecoration: 'none'}}
+                        className={nav => (nav.isActive ? `${headerStyles.marginLeft10} text text_type_main-default` : `${headerStyles.marginLeft10} text text_type_main-default text_color_inactive`)}>
                         Лента заказов
-                    </p>
-                </a>
+                    </NavLink>
+                </div>
             </div>
             <div className={headerStyles.logo}>
                 <Logo/>
             </div>
-            <a href={''} className={headerStyles.office}>
-                <ProfileIcon type="secondary"/>
-                <p className={`${headerStyles.marginLeft10} text text_type_main-default text_color_inactive`}>
-                    Личный кабинет
-                </p>
-            </a>
-
+            <div className={headerStyles.flexRowCenter}>
+                <div className={headerStyles.flexRowCenter}>
+                    <ProfileIcon type="secondary"/>
+                    <NavLink
+                        to={`/profile`}
+                        style={{textDecoration: 'none'}}
+                        className={nav => (nav.isActive ? `${headerStyles.marginLeft10} text text_type_main-default` : `${headerStyles.marginLeft10} text text_type_main-default text_color_inactive`)}
+                    >
+                        Личный кабинет
+                    </NavLink>
+                </div>
+            </div>
         </header>
     );
 }

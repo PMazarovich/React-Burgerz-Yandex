@@ -4,10 +4,11 @@ import burgerIngredientsStyles from './burger-ingredients.module.css'
 import counterImage from '../../images/counterIcon.png'
 import PropTypes from "prop-types";
 import Modal from "../Modal/modal";
-import IngredientDetails from "../IngredientDetails/ingredient-details";
+import IngredientDetailsModal from "../IngredientDetailsModal/ingredient-details-modal";
 import {foodIngredientsPropTypes} from "../../utils/prop-types";
 import {useDispatch, useSelector} from "react-redux";
 import {useDrag} from "react-dnd";
+import {useNavigate} from "react-router-dom";
 
 
 function BurgerIngredients({setIngredientDragging}) {
@@ -102,6 +103,7 @@ function BurgerIngredients({setIngredientDragging}) {
     function FoodContainer(props) {
         const {ingredientId, imgSrc, imgAlt, name, price, proteins, fat, carbohydrates, calories} = props
         const dispatch = useDispatch();
+        const navigate = useNavigate()
         // ВНИМАНИЕ! ВСЕГДА ПЕРЕДАВАТЬ В ПРИЕМНИК ПО DND ПО ВОЗМОЖНОСТИ ТОЛЬКО ID! ИНАЧЕ ПОВЫШАЕТСЯ СВЯЗАННОСТЬ КОМПОНЕНТОВ
         const [{isDrag}, dragRef] = useDrag({   //<- он возвращает {тут всякие возвращаемые объекты типа monitor.isDragging() и т.д.} и ref компонента, на который повешен этот хук
             type: "abstractIngredient",
@@ -123,16 +125,38 @@ function BurgerIngredients({setIngredientDragging}) {
         }, [isDrag]);
 
         const [detailsShowed, setDetailsShowed] = React.useState(false)
+        useEffect(() => {
+            const ingredientIdd = localStorage.getItem('portalOpen');
+            if (ingredientIdd != null && ingredientIdd === ingredientId ) {
+                switchDetailsShowed(ingredientIdd)
+            } else {
+                setDetailsShowed(null)
+            }
+        }, [])
+        function switchDetailsShowed(ingredientId) {
+            console.log("ingredientId IS ", ingredientId)
+            const currentState = window.history.state; // Get the current state
+            console.log(currentState)
+            const newURL = new URL(window.location.href);
+            newURL.pathname = `/ingredients/${ingredientId}`;
 
-        function switchDetailsShowed() {
-            setDetailsShowed(!detailsShowed)
+            if(!detailsShowed){
+                setDetailsShowed(true)
+                window.history.pushState(currentState, '', newURL);
+                localStorage.setItem('portalOpen', ingredientId);
+            } else {
+                setDetailsShowed(false)
+                navigate('/')
+                localStorage.removeItem('portalOpen');
+            }
+
         }
 
         return (
             <>
                 <div ref={dragRef}          // Реф из useDrag
                      onClick={() => {
-                         switchDetailsShowed()
+                         switchDetailsShowed(ingredientId)
                      }} className={burgerIngredientsStyles.foodContainerParent}>
                     <div
                         className={burgerIngredientsStyles.relative}>{/*parent should be relative so child can be absolute relatively to parent */}
@@ -149,8 +173,8 @@ function BurgerIngredients({setIngredientDragging}) {
                 </div>
                 {detailsShowed &&
                     <Modal onCloseFunction={switchDetailsShowed} headerText={"Ingredient details:"}>
-                        <IngredientDetails calories={calories} name={name} imgAlt={imgAlt} imgSrc={imgSrc}
-                                           proteins={proteins} carbohydrates={carbohydrates} fat={fat}/>
+                        <IngredientDetailsModal calories={calories} name={name} imgAlt={imgAlt} imgSrc={imgSrc}
+                                                proteins={proteins} carbohydrates={carbohydrates} fat={fat}/>
                     </Modal>}
             </>
 

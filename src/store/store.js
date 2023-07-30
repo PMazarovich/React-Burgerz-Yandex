@@ -4,12 +4,14 @@ import thunk from 'redux-logger'
 import {ingredientsReducers} from "./reducers/IngredientsListSlice";
 import {constructorReducers} from "./reducers/BurgerConstructorSlice";
 import {submitAnOrderReducers} from "./reducers/SubmitAnOrderSlice";
+import {authReducers} from "./reducers/AuthSlice";
 
 
 const rootReducer = combineReducers({   // Соберем все reducers в один и передадим потом в rootReducer
     ingredientsState: ingredientsReducers,
     constructorState: constructorReducers,
-    submitAnOrderState: submitAnOrderReducers
+    submitAnOrderState: submitAnOrderReducers,
+    authState: authReducers
 })
 
 export const store = configureStore({

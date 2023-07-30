@@ -1,0 +1,53 @@
+.gridWrapper {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-top: 150px;
+    min-height: 200px;
+}
+
+.textBoxColumns {
+    grid-column-start: 2;
+    grid-column-end: 4;
+}
+
+
+.inputBoxColumns {
+    grid-column-start: 4;
+    grid-column-end: 7;
+}
+
+.buttonFlexedRow {
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    align-items: center;
+    column-gap: 60px;
+    margin-top: 30px;
+}
+
+
+.flexedCenterContainer{
+    display: flex; /* or inline-flex */
+    flex-direction: column;
+    align-content: center;
+    align-items: center;
+}
+
+.flexedTextContainer{
+    display: flex; /* or inline-flex */
+    flex-direction: column;
+    align-content: center;
+    align-items: center;
+    row-gap: 10px;
+}
+
+.marginTop20px{
+    margin-top: 20px;
+}
+.marginTop80px{
+    margin-top: 80px;
+}
+
+.noUnderline {
+    text-decoration: none;
+}
