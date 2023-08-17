@@ -5,6 +5,7 @@ https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Grid_Layout/Basic_Concepts_
 https://yandex-practicum.github.io/react-developer-burger-ui-components/docs/tab - ЯНДЕКС КОМПОНЕНТЫ
 https://www.flaticon.com/ - ИКОНКИ
 https://medium.com/@mautayro/understanding-css-position-display-float-87f9727334b2 - POSITION DISPLAY ETC
+https://cssloaders.github.io/ - spinner
 
 DEBUG - run Debug and then ctrl+shift and go to Local:  http://localhost:3000   in Process console
 
@@ -24,3 +25,70 @@ const scrollClassNames = classNames('custom-scroll', constructorStyles.scroll,  
                 {props.children}
             </div>
         </div>
+
+
+///// АСИНХРОННОЕ ПРОГРАММИРОВАНИЕ
+Использовать этот подход тогда, когда нужно БЛОКИРОВАТЬ поток до выполнения Promise
+try {
+        const data = await loginRequest(signInMessage); // Execution will pause here until the promise is resolved
+        saveAuthInfo("login", data);
+    } catch (e) {
+        alert("A signIn error occurred, see console for details");
+        throw e;
+    }
+
+Если блокирование потока НЕ ТРЕБУЕТСЯ,
+async function signIn(signInMessage) {
+        loginRequest(signInMessage).then(data => {
+            saveAuthInfo("login", data)
+        }).catch(e => {
+            alert("a signIn error occured, see console for details")
+            throw e;
+        })
+    }
+Это используется тогда, когда вместо ожидания, делаем что-то полезное. Например, показываем спиннер или какие-нибудь данные подгружаем за горизонтом
+В компонентах JSX await и использовать НЕЛЬЗЯ. Только then catch, т.к. компонент должен быть нарисован синхронно
+А уже далее можно асинхронные вызовы ловить через коллбэки then catch и менять уже отрисованную страницу
+
+////// <a> и <Link>
+<a> - перезагружает всю страницу, <Link> - нет. (useNavigate тоже не перерисовывает).
+<а> использовать для перехода на внешние источники, <Link> - для одностраничного приложения
+
+/////---------------------------/////
+Немедленная отрисовка внутри компонента после изменения состояния в Redux не всегда срабатывает, Поэтому лучше делать некоторые запросы непосредственно в компоненте, а не полагаться на опосредованное изменение state в Redux.
+
+ТО ЕСТЬ ЕСЛИ НУЖНА НЕМЕДЛЕННАЯ ПЕРЕРИСОВКА КОМПОНЕНТА, НА DISPATCH НЕ ПОЛАГАТЬСЯ!
+
+export function ProtectedRouteElement({ children }) {
+    let auth = useAuth();
+    const [isUserLoaded, setUserLoaded] = useState(false);
+    const dispatch = useDispatch();
+    useEffect(() => {
+        async function checkUserAuth() {
+            try {
+                const user = await auth.getUser();
+                // Assuming auth.getUser() returns user object if authenticated
+                dispatch(authActions.userLoggedIn({}));
+                setUserLoaded(true);
+            } catch (error) {
+                setUserLoaded(true);
+            }
+        }
+
+       checkUserAuth();
+    }, []);
+
+    const userLoggedIn = useSelector((store) => store.authState.userLoggedIn);
+
+    if (!isUserLoaded) { // Show loading or some placeholder if user info is still being fetched
+        return <div>Loading...</div>;
+    }
+
+    if (userLoggedIn) {
+        // Если user есть, возвращаем элемент, который был в аргументах ProtectedRoute
+        return children;
+    } else { // Если user нет, то перенаправляем его обратно на login
+        return <Navigate to="/login" replace />;
+    }
+}
+////////////////////////////////////////

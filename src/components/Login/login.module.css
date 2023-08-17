@@ -1,0 +1,28 @@
+.gridWrapper {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: minmax(200px, auto);
+    margin-top: 150px;
+}
+
+.centralBox {
+    grid-column-start: 2;
+    grid-column-end: 3;
+    grid-row-start: 1;
+    grid-row-end: 2;
+}
+
+
+.flexedCenterColumn{
+    display: flex; /* or inline-flex */
+    flex-direction: column;
+    align-content: center;
+    align-items: center;
+}
+
+.marginTop20px{
+    margin-top: 20px;
+}
+.marginTop80px{
+    margin-top: 80px;
+}

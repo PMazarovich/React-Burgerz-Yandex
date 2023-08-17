@@ -16,7 +16,7 @@ TextDetailsContainer.propTypes = {
     value: PropTypes.any.isRequired,
 }
 
-function IngredientDetails({imgSrc, imgAlt, name, proteins, fat, carbohydrates, calories}) {
+function IngredientDetailsModal({imgSrc, imgAlt, name, proteins, fat, carbohydrates, calories}) {
     return (
         <div className={ingredientDetailsStyles.centerColumn}>
             <div
@@ -35,6 +35,6 @@ function IngredientDetails({imgSrc, imgAlt, name, proteins, fat, carbohydrates, 
 
     );
 }
-IngredientDetails.propTypes = foodIngredientsPropTypes
+IngredientDetailsModal.propTypes = foodIngredientsPropTypes
 
-export default IngredientDetails;
+export default IngredientDetailsModal;

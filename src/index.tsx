@@ -12,7 +12,6 @@ const root = ReactDOM.createRoot(
 
 root.render(
     <>
-        <React.StrictMode>
             <Provider store={store}> {/* это провайдер redux для всего приложения */}
                 {/*Корневой элемент для приложения*/}
                 <App/>
@@ -20,7 +19,6 @@ root.render(
                 <div id="react-modals"
                      style={{position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}/>
             </Provider>
-        </React.StrictMode>
     </>
 );
 
