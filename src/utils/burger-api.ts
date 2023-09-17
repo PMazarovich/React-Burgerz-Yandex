@@ -2,9 +2,9 @@ import {getCookie} from "./utils";
 import {
     IAuthResponse,
     IIngredient,
-    ILoginCredentials, ILogoutResponse,
+    ILoginCredentials,
+    ILogoutResponse,
     INewRefreshTokenResponse,
-    IOrder,
     IUserRegistration,
     IUserResponse
 } from "./Interfaces";
@@ -39,7 +39,7 @@ async function getIngredients(): Promise<Array<IIngredient>> {
 }
 
 
-async function postOrder(order: IOrder): Promise<number> { /* This returns order number OR throws an error */
+async function postOrder(order: Array<string>): Promise<number> { /* This returns order number OR throws an error */
     const response: Response = await fetch(`${NORMA_API}/orders`, {
         method: 'POST',
         headers: {
@@ -48,9 +48,8 @@ async function postOrder(order: IOrder): Promise<number> { /* This returns order
         },
         body: JSON.stringify({"ingredients": order})
     });
-    // noinspection UnnecessaryLocalVariableJS
-    let extractedJson = await parseJsonFromResponse(checkReponseStatusCode(response))
-    return extractedJson
+
+    return await parseJsonFromResponse(checkReponseStatusCode(response))
 }
 
 

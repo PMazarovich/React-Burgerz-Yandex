@@ -22,10 +22,11 @@ export interface IFoodContainer extends Omit<IIngredient, "_id" | "__v" | "price
     imgSrc: string;
     imgAlt: string;
 }
-//////////////////////////////API///////////////////////////////
-export interface IOrder {
-    ids: Array<string>
+
+export interface IConstructorState extends IIngredient{
+    bun: string
 }
+//////////////////////////////API///////////////////////////////
 
 export interface IUserResponse {
     success: boolean;
