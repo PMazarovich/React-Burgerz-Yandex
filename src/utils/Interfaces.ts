@@ -1,3 +1,6 @@
+import exp from "constants";
+import PropTypes from "prop-types";
+
 export interface IIngredient{
     _id: string;
     name: string;
@@ -13,6 +16,13 @@ export interface IIngredient{
     __v: number;
 }
 
+export interface IFoodContainer extends Omit<IIngredient, "_id" | "__v" | "price" | "image_large" | "image" | "image_mobile" | "type"> {
+    ingredientId: string;
+    price?: number; // This is optional, so use "?"
+    imgSrc: string;
+    imgAlt: string;
+}
+//////////////////////////////API///////////////////////////////
 export interface IOrder {
     ids: Array<string>
 }
@@ -46,4 +56,8 @@ export interface INewRefreshTokenResponse extends Omit<IAuthResponse, "user"> {
 export interface ILogoutResponse{
     success: boolean
     message: string
+}
+////////////////////////////////////////COMPONENTS/////////////////////////////
+export interface IBurgerIngredients{
+    setIngredientDragging: (value: boolean) => void;
 }

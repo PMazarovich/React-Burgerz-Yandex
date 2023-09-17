@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react';
+import React, {ForwardedRef, ReactNode, useEffect, useRef} from 'react';
 import {CurrencyIcon, Tab} from "@ya.praktikum/react-developer-burger-ui-components";
 import burgerIngredientsStyles from './burger-ingredients.module.css'
 import counterImage from '../../images/counterIcon.png'
@@ -9,24 +9,28 @@ import {foodIngredientsPropTypes} from "../../utils/prop-types";
 import {useDispatch, useSelector} from "react-redux";
 import {useDrag} from "react-dnd";
 import {useNavigate} from "react-router-dom";
+import {IBurgerIngredients, IFoodContainer, IIngredient} from "../../utils/Interfaces";
 
 
-function BurgerIngredients({setIngredientDragging}) {
-    const [currentTab, setCurrentTab] = React.useState('one')
+function BurgerIngredients({setIngredientDragging}: IBurgerIngredients) {
+    const [currentTab, setCurrentTab] = React.useState<string>('one')
     // if there will be more tabs, then we'll think how to create a generic code
-    const tabsRef = useRef(null);
-    const bunsRef = useRef(null);
-    const saucesRef = useRef(null);
-    const fillingsRef = useRef(null);
+    const tabsRef = useRef<HTMLDivElement>(null);
+    const bunsRef = useRef<HTMLDivElement>(null);
+    const saucesRef = useRef<HTMLDivElement>(null);
+    const fillingsRef = useRef<HTMLDivElement>(null);
 
-    function handleScroll() {
+    function handleScroll(): void {
         // here we will get the coordinates of the tab and will calculate the distance from each <FoodSection> component.
         // After we will activate less distance tab. So if the minimum distance is for buns, activate "buns" tab etc
-        let tabsCoords = Math.abs(tabsRef.current.getBoundingClientRect().y)
-        let coordinates = { // calculate a difference
-            "buns": Math.abs(bunsRef.current.getBoundingClientRect().y) - tabsCoords,
-            "fillings": Math.abs(fillingsRef.current.getBoundingClientRect().y) - tabsCoords,
-            "sauces": Math.abs(saucesRef.current.getBoundingClientRect().y) - tabsCoords
+        let coordinates: { buns: number, fillings: number, sauces: number } = {buns: 0, fillings: 0, sauces: 0}
+        if (bunsRef.current != null && fillingsRef.current != null && saucesRef.current != null && tabsRef.current != null) {
+            let tabsCoords = Math.abs(tabsRef.current.getBoundingClientRect().y)
+            coordinates = { // calculate a difference
+                "buns": Math.abs(bunsRef.current.getBoundingClientRect().y) - tabsCoords,
+                "fillings": Math.abs(fillingsRef.current.getBoundingClientRect().y) - tabsCoords,
+                "sauces": Math.abs(saucesRef.current.getBoundingClientRect().y) - tabsCoords
+            }
         }
         // Convert object to array of key-value pairs
         let coordinatesArray = Object.entries(coordinates);
@@ -37,34 +41,38 @@ function BurgerIngredients({setIngredientDragging}) {
     }
 
     //const burgerConstructorState = useContext(CommonDataFromServerContext); // тащим burgerConstructorState из контекста
-    const {ingredients, currentIngredientsIds} = useSelector(store => ({
+    const {ingredients, currentIngredientsIds} = useSelector((store: any) => ({
         ingredients: store.ingredientsState.ingredients,
         currentIngredientsIds: store.constructorState.ingredients
     }))
     /* Стараться всё, что можно делать в JS, а результаты уже рендерить в JSX */
-    const buns = ingredients.filter((item) => item.type === 'bun')
-    const mains = ingredients.filter((item) => item.type === 'main')
-    const sauces = ingredients.filter((item) => item.type === 'sauce')
+    const buns: Array<IIngredient> = ingredients.filter((item: IIngredient) => item.type === 'bun')
+    const mains: Array<IIngredient> = ingredients.filter((item: IIngredient) => item.type === 'main')
+    const sauces: Array<IIngredient> = ingredients.filter((item: IIngredient) => item.type === 'sauce')
 
 
-    function calculateHeight(distanceFromBottom = 200) {
+    function calculateHeight(distanceFromBottom: number = 200): number {
         // get the height of the screen
         // set the desired distance from the bottom
         // calculate the max scrollable height
         return window.innerHeight - distanceFromBottom
     }
 
-    calculateHeight.propTypes = {
-        distanceFromBottom: PropTypes.number   /* this is optional */
-    };
+    // By using React.forwardRef(), you can receive the ref as a parameter in the functional component and then forward it to the desired DOM element
+    interface FoodSectionProps {
+        sectionName: string;
+        children: ReactNode;
+    }
 
-    //By using React.forwardRef(), you can receive the ref as a parameter in the functional component and then forward it to the desired DOM element
-    const FoodSection = React.forwardRef(({sectionName, children}, ref) => {
+    const FoodSection = React.forwardRef<HTMLSpanElement, FoodSectionProps>(({
+                                                                                 sectionName,
+                                                                                 children
+                                                                             }, ref: ForwardedRef<HTMLSpanElement>) => {
         return (
             <>
-                <span ref={ref} className={`${burgerIngredientsStyles.marginTop50marginLeft30} text_type_main-medium`}>
-                  {sectionName}
-                </span>
+            <span ref={ref} className={`${burgerIngredientsStyles.marginTop50marginLeft30} text_type_main-medium`}>
+              {sectionName}
+            </span>
                 <div className={burgerIngredientsStyles.foodSectionParent}>
                     {children}
                 </div>
@@ -72,14 +80,9 @@ function BurgerIngredients({setIngredientDragging}) {
         );
     });
 
-    FoodSection.propTypes = {
-        sectionName: PropTypes.string.isRequired
-    };
-
-
-    function FoodCounter({ ingredientId }) { /* this component should be placed inside relative component!*/
+    function FoodCounter({ ingredientId }: { ingredientId: string }) { /* this component should be placed inside relative component!*/
         // соберем все совпадения из constructor для данного элемента
-        let count = currentIngredientsIds.filter(currentIngredientsId => currentIngredientsId.ingredientId === ingredientId).length
+        let count: number = currentIngredientsIds.filter((currentIngredientsId: { uuid: string; ingredientId: string; }) => currentIngredientsId.ingredientId === ingredientId).length
         return (
             /* будем скрывать счетчик если количество 0*/
             <div hidden={count <= 0} className={burgerIngredientsStyles.absoluteTop0Right0}> {/* tiny image and text*/}
@@ -94,14 +97,11 @@ function BurgerIngredients({setIngredientDragging}) {
         )
     }
 
-    FoodCounter.propTypes = {
-        ingredientId: PropTypes.string.isRequired
-    }
 
     /*картинка + описание + счетчик + вызов портала с описанием на левый клик*/
+
     // Этот компонент перетаскиваемый
-    function FoodContainer(props) {
-        const {ingredientId, imgSrc, imgAlt, name, price, proteins, fat, carbohydrates, calories} = props
+    function FoodContainer({ingredientId, imgSrc, imgAlt, name, price, proteins, fat, carbohydrates, calories}: IFoodContainer) {
         const dispatch = useDispatch();
         const navigate = useNavigate()
         // ВНИМАНИЕ! ВСЕГДА ПЕРЕДАВАТЬ В ПРИЕМНИК ПО DND ПО ВОЗМОЖНОСТИ ТОЛЬКО ID! ИНАЧЕ ПОВЫШАЕТСЯ СВЯЗАННОСТЬ КОМПОНЕНТОВ
@@ -124,23 +124,24 @@ function BurgerIngredients({setIngredientDragging}) {
             }
         }, [isDrag]);
 
-        const [detailsShowed, setDetailsShowed] = React.useState(false)
+        const [detailsShowed, setDetailsShowed] = React.useState<boolean>(false)
         useEffect(() => {
             const ingredientIdd = localStorage.getItem('portalOpen');
-            if (ingredientIdd != null && ingredientIdd === ingredientId ) {
+            if (ingredientIdd != null && ingredientIdd === ingredientId) {
                 switchDetailsShowed(ingredientIdd)
             } else {
-                setDetailsShowed(null)
+                setDetailsShowed(false)
             }
         }, [])
-        function switchDetailsShowed(ingredientId) {
+
+        function switchDetailsShowed(ingredientId: string) {
             console.log("ingredientId IS ", ingredientId)
             const currentState = window.history.state; // Get the current state
             console.log(currentState)
-            const newURL = new URL(window.location.href);
+            const newURL: URL = new URL(window.location.href);
             newURL.pathname = `/ingredients/${ingredientId}`;
 
-            if(!detailsShowed){
+            if (!detailsShowed) {
                 setDetailsShowed(true)
                 window.history.pushState(currentState, '', newURL);
                 localStorage.setItem('portalOpen', ingredientId);
