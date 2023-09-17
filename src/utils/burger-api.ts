@@ -1,20 +1,29 @@
 import {getCookie} from "./utils";
+import {
+    IAuthResponse,
+    IIngredient,
+    ILoginCredentials, ILogoutResponse,
+    INewRefreshTokenResponse,
+    IOrder,
+    IUserRegistration,
+    IUserResponse
+} from "./Interfaces";
 
 let NORMA_API = "https://norma.nomoreparties.space/api"
 
 /* we need this function as there may be some cases when we can do some summary basing only on status code (201, 202 etc)
 * That's why it is better to parse json in the separate function just like we do with checkReponseStatusCode
 *  */
-async function parseJsonFromResponse(response) { /* taking Response object */
-    const data = await response.json();
+// todo here it can be any type of all response types. fill this later
+async function parseJsonFromResponse(response: Response): Promise<any> {  // todo return type!
+    const data: any = await response.json();
     if (data.error) {
         throw new Error("failed to parse json", data.error);
     } else {
         return data
     }
 }
-
-function checkReponseStatusCode(response) { /* taking Response object */
+function checkReponseStatusCode(response: Response): Response {
     if (response.ok) { /* status codes: 200-299 */
         return response;
     } else {
@@ -23,15 +32,15 @@ function checkReponseStatusCode(response) { /* taking Response object */
     }
 }
 
-async function getIngredients() { /* This returns Ingredients data OR throws an error */
-    const response = await fetch(`${NORMA_API}/ingredients`);
-    let extractedJson = await parseJsonFromResponse(checkReponseStatusCode(response))
+async function getIngredients(): Promise<Array<IIngredient>> {
+    const response: Response = await fetch(`${NORMA_API}/ingredients`);
+    const extractedJson = await parseJsonFromResponse(checkReponseStatusCode(response))
     return extractedJson.data
 }
 
 
-async function postOrder(order) { /* This returns order number OR throws an error */
-    const response = await fetch(`${NORMA_API}/orders`, {
+async function postOrder(order: IOrder): Promise<number> { /* This returns order number OR throws an error */
+    const response: Response = await fetch(`${NORMA_API}/orders`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -46,19 +55,19 @@ async function postOrder(order) { /* This returns order number OR throws an erro
 
 
 /////////////////////////////////////AUTH///////////////////////////////////////
-async function restorePassword(email){
-    const response = await fetch(`${NORMA_API}/password-reset`,{
+async function restorePassword(email: string): Promise<void>{
+    const response: Response = await fetch(`${NORMA_API}/password-reset`,{
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({"email": email})
     })
-    return await parseJsonFromResponse(checkReponseStatusCode(response))
+    checkReponseStatusCode(response)
 }
 
-async function resetPassword(password, token){
-    const response = await fetch(`${NORMA_API}/password-reset/reset`,{
+async function resetPassword(password: string, token: string): Promise<void>{
+    const response: Response = await fetch(`${NORMA_API}/password-reset/reset`,{
         method: 'POST',
 
         headers: {
@@ -66,12 +75,12 @@ async function resetPassword(password, token){
         },
         body: JSON.stringify({"password": password, "token": token})
     })
-    return await parseJsonFromResponse(checkReponseStatusCode(response))
+    checkReponseStatusCode(response)
 }
 
-async function getUserRequest() {
+async function getUserRequest(): Promise<IUserResponse> {
     // нужно передать запрос только из куков
-    const response = await fetch(`${NORMA_API}/auth/user`, {
+    const response: Response = await fetch(`${NORMA_API}/auth/user`, {
         method: 'GET',
         mode: 'cors',
         cache: 'no-cache',
@@ -83,58 +92,28 @@ async function getUserRequest() {
         redirect: 'follow',
         referrerPolicy: 'no-referrer'
     })
-    // возврат
-    /*
-    {
-    "success": true,
-    "user": {
-        "email": "henzpqzyofer8k63yovu1bskl8fgqckd@test.com",
-        "name": "ReactBurgerzUzer"
-    }
-} */
     let res = await parseJsonFromResponse(checkReponseStatusCode(response))
     return res
 }
 
-async function loginRequest(form) {
-    /*
-    form = {
-        "email": "",
-        "password": ""
-         }
-    */
+async function loginRequest(creds: ILoginCredentials): Promise<IAuthResponse> {
     console.log("in burger-api.loginRequest")
     const response = await fetch(`https://norma.nomoreparties.space/api/auth/login`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(form)
+        body: JSON.stringify(creds)
     });
     console.log("loginRequest was made")
-    /*{
-         "success": true,
-         "accessToken": "Bearer ...",
-         "refreshToken": "",
-         "user": {
-           "email": "",
-           "name": ""
-         }
-    } */
-
     return await parseJsonFromResponse(checkReponseStatusCode(response))
 
 }
 
-async function registerRequest(registerRequest) {
-    /* form вида = {
-        "email": form.email,
-        "password": form.password,
-        "name": form.name
-    }*/
+async function registerRequest(registerRequest: IUserRegistration): Promise<IAuthResponse> {
     console.log("in registerRequest")
     console.log(registerRequest)
-    const response = await fetch(`${NORMA_API}/auth/register`, {
+    const response: Response = await fetch(`${NORMA_API}/auth/register`, {
         method: 'POST',
         mode: 'cors',
         cache: 'no-cache',
@@ -146,22 +125,12 @@ async function registerRequest(registerRequest) {
         referrerPolicy: 'no-referrer',
         body: JSON.stringify(registerRequest)
     });
-   /* образец ответа
-    {
-        "success": true,
-        "user": {
-        "email": "",
-            "name": ""
-    },
-        "accessToken": "Bearer ...",
-        "refreshToken": ""
-    }*/
     let extractedJson = await parseJsonFromResponse(checkReponseStatusCode(response))
     return extractedJson
 }
 
-async function getNewAccessToken(refreshToken) {
-    const response = await fetch(`${NORMA_API}/auth/token`, {
+async function getNewAccessToken(refreshToken: string): Promise<INewRefreshTokenResponse> {
+    const response: Response = await fetch(`${NORMA_API}/auth/token`, {
         method: 'POST',
         mode: 'cors',
         cache: 'no-cache',
@@ -174,16 +143,11 @@ async function getNewAccessToken(refreshToken) {
         body: JSON.stringify({"token": refreshToken})
     });
     let extractedJson = await parseJsonFromResponse(checkReponseStatusCode(response))
-    /*{
-       "success": true,
-       "accessToken": "Bearer ...",
-        "refreshToken": ""
-      } */
     return extractedJson.accessToken
 }
 
-async function logout(refreshToken) {
-    const response = await fetch(`${NORMA_API}/auth/logout`, {
+async function logout(refreshToken: string): Promise<ILogoutResponse> {
+    const response: Response = await fetch(`${NORMA_API}/auth/logout`, {
         method: 'POST',
         mode: 'cors',
         cache: 'no-cache',
@@ -202,16 +166,11 @@ async function logout(refreshToken) {
       }
     * */
     let extractedJson = await parseJsonFromResponse(checkReponseStatusCode(response))
-    /*{
-       "success": true,
-       "accessToken": "Bearer ...",
-        "refreshToken": ""
-      } */
     return extractedJson
 }
 
 
-async function fetchIngredientById(id) {
+async function fetchIngredientById(id: string): Promise<IIngredient> {
     const response = await fetch(`${NORMA_API}/ingredients/${id}`, {
         method: 'GET',
         mode: 'cors',
@@ -223,23 +182,12 @@ async function fetchIngredientById(id) {
         },
         redirect: 'follow',
         referrerPolicy: 'no-referrer',
-    });
-    /*
-    * {
-      "success": true,
-      "message": "Successful logout"
-      }
-    * */
+    })
     let extractedJson = await parseJsonFromResponse(checkReponseStatusCode(response))
-    /*{
-       "success": true,
-       "accessToken": "Bearer ...",
-        "refreshToken": ""
-      } */
     return extractedJson
 }
 
-async function updateUser(name, email, password){
+async function updateUser(name: string, email: string, password: string){ // todo check what will be returned
     const response = await fetch(`${NORMA_API}/auth/user`, {
         method: 'PATCH',
         mode: 'cors',
