@@ -1,7 +1,6 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {Button, ConstructorElement, CurrencyIcon, DragIcon} from "@ya.praktikum/react-developer-burger-ui-components";
 import constructorStyles from './burger-constructor.module.css'
-import Modal from "../Modal/modal";
 import OrderDetails from "../OrderDetails/order-details";
 import {postOrder} from '../../utils/burger-api'
 import {useDispatch, useSelector} from "react-redux";
@@ -12,6 +11,7 @@ import classNames from 'classnames';
 //---this is for inner sorting--------//
 import update from "immutability-helper";
 import {IIngredient} from "../../utils/Interfaces";
+import {Modal} from "../Modal/modal";
 
 function restoreIngredientById(ingredientList: Array<IIngredient>, ingredientId: string): IIngredient {
     return ingredientList.filter(originalIngredient => originalIngredient._id === ingredientId)[0] // we know that ids are unique, so we can get [0]

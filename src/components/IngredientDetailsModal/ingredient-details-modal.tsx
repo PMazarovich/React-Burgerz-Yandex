@@ -2,8 +2,9 @@ import React from 'react';
 import PropTypes from "prop-types";
 import ingredientDetailsStyles from './ingredient-details.module.css'
 import {foodIngredientsPropTypes} from '../../utils/prop-types'
+import {IIngredientDetailsModal} from "../../utils/Interfaces";
 
-function TextDetailsContainer({name, value}){
+function TextDetailsContainer({name, value}: {name: string, value: string | number}){
     return(
         <div className={ingredientDetailsStyles.textDetails}>
             <span className={"text_type_main-medium text_color_inactive"}>{name}</span>
@@ -11,12 +12,8 @@ function TextDetailsContainer({name, value}){
         </div>
     )
 }
-TextDetailsContainer.propTypes = {
-    name: PropTypes.string.isRequired,
-    value: PropTypes.any.isRequired,
-}
 
-function IngredientDetailsModal({imgSrc, imgAlt, name, proteins, fat, carbohydrates, calories}) {
+function IngredientDetailsModal({imgSrc, imgAlt, name, proteins, fat, carbohydrates, calories}: IIngredientDetailsModal) {
     return (
         <div className={ingredientDetailsStyles.centerColumn}>
             <div

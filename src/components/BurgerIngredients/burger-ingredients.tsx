@@ -3,13 +3,13 @@ import {CurrencyIcon, Tab} from "@ya.praktikum/react-developer-burger-ui-compone
 import burgerIngredientsStyles from './burger-ingredients.module.css'
 import counterImage from '../../images/counterIcon.png'
 import PropTypes from "prop-types";
-import Modal from "../Modal/modal";
 import IngredientDetailsModal from "../IngredientDetailsModal/ingredient-details-modal";
 import {foodIngredientsPropTypes} from "../../utils/prop-types";
 import {useDispatch, useSelector} from "react-redux";
 import {useDrag} from "react-dnd";
 import {useNavigate} from "react-router-dom";
 import {IBurgerIngredients, IFoodContainer, IIngredient} from "../../utils/Interfaces";
+import {Modal} from "../Modal/modal";
 
 
 function BurgerIngredients({setIngredientDragging}: IBurgerIngredients) {
@@ -134,7 +134,7 @@ function BurgerIngredients({setIngredientDragging}: IBurgerIngredients) {
             }
         }, [])
 
-        function switchDetailsShowed(ingredientId: string) {
+        function switchDetailsShowed(ingredientId?: string) {
             console.log("ingredientId IS ", ingredientId)
             const currentState = window.history.state; // Get the current state
             console.log(currentState)
@@ -144,7 +144,9 @@ function BurgerIngredients({setIngredientDragging}: IBurgerIngredients) {
             if (!detailsShowed) {
                 setDetailsShowed(true)
                 window.history.pushState(currentState, '', newURL);
-                localStorage.setItem('portalOpen', ingredientId);
+                if (typeof ingredientId === "string") {
+                    localStorage.setItem('portalOpen', ingredientId);
+                }
             } else {
                 setDetailsShowed(false)
                 navigate('/')
@@ -178,12 +180,8 @@ function BurgerIngredients({setIngredientDragging}: IBurgerIngredients) {
                                                 proteins={proteins} carbohydrates={carbohydrates} fat={fat}/>
                     </Modal>}
             </>
-
-
         );
     }
-
-    FoodContainer.propTypes = foodIngredientsPropTypes
 
     return (
 

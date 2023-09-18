@@ -4,20 +4,21 @@ import {Button, Input} from "@ya.praktikum/react-developer-burger-ui-components"
 import {useDispatch, useSelector} from "react-redux";
 import {updateUser} from "../../utils/burger-api";
 import {authActions} from "../../store/reducers/AuthSlice";
+import {TICons} from "@ya.praktikum/react-developer-burger-ui-components/dist/ui/icons";
 
 function Profile() {
-    const {namee, emaill} = useSelector((state) => ({
+    const {namee, emaill} = useSelector((state: any) => ({
         namee: state.authState.name,
         emaill: state.authState.email
     }));
     const dispatch = useDispatch()
-    const [showCommitButtons, setShowCommitButtons] = React.useState(false)
+    const [showCommitButtons, setShowCommitButtons] = React.useState<boolean>(false)
     const [name, setName] = React.useState(namee)
-    const [password, setPassword] = React.useState('')
-    const [email, setEmail] = React.useState(emaill)
-    const [passwordShowed, setPasswordShowed] = React.useState(false)
-    const [passwordIconState, setPasswordIconState] = React.useState('HideIcon')
-    const [passwordFieldType, setPasswordFieldType] = React.useState('password')
+    const [password, setPassword] = React.useState<string>('')
+    const [email, setEmail] = React.useState<string>(emaill)
+    const [passwordShowed, setPasswordShowed] = React.useState<boolean>(false)
+    const [passwordIconState, setPasswordIconState] = React.useState<keyof TICons | undefined>('HideIcon')
+    const [passwordFieldType, setPasswordFieldType] = React.useState< "password" | "email" | "text" | undefined>('password')
     useEffect(() => {
             if (passwordShowed) {
                 setPasswordIconState('HideIcon')

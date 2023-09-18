@@ -1,2 +1,2 @@
-const ESC_KEYCODE = 27
+const ESC_KEYCODE = "27"
 export default ESC_KEYCODE

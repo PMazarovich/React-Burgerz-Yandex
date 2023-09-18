@@ -1,16 +1,16 @@
 
 // Этот компонент будет проверять аутентифицированность пользователя для каждого защищенного маршрута в приложении
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useAuth} from "../../utils/auth";
 import {Navigate} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {authActions} from "../../store/reducers/AuthSlice";
 
-export function ProtectedRouteElement({ children }) {
+export function ProtectedRouteElement({ children }: {children: React.ReactNode}): React.ReactNode {
     // Вернём из хранилища запрос на получение данных о пользователе и текущий объект с пользователем
     let auth = useAuth();
     const [isUserLoaded, setUserLoaded] = useState(false);
-    const userLoggedIn = useSelector((store) => store.authState.userLoggedIn);
+    const userLoggedIn = useSelector((store: any) => store.authState.userLoggedIn);
     // getUser всего лишь пытается получить пользователя (логин/email/его права/что угодно).
     // getUser вызывается 1 раз за время жизни приложения (в самом начале при попытке входа на любой "защищенный" маршрут).
     const dispatch = useDispatch();
@@ -19,9 +19,15 @@ export function ProtectedRouteElement({ children }) {
         async function checkUserAuth() {
             try {
                 const creds = await auth.getUser();
-                console.log(creds)
-                dispatch(authActions.userLoggedIn({email: creds.user.email, name: creds.user.name, permissions: null, userLoggedIn: true }));
-                setUserLoaded(true);
+                if(creds){
+                    dispatch(authActions.userLoggedIn({email: creds.user.email, name: creds.user.name, permissions: null, userLoggedIn: true }));
+                    console.log(creds)
+                    setUserLoaded(true);
+                }
+                else{
+                    setUserLoaded(false);
+                }
+
             } catch (error) {
                 setUserLoaded(true);
             }

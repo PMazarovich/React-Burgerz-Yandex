@@ -1,35 +1,20 @@
 import React, {useEffect, useState} from 'react';
-import loginStyles from './login.module.css'
+import loginStyles from './registration.module.css'
 import {Button, HideIcon, Input, ShowIcon} from "@ya.praktikum/react-developer-burger-ui-components";
 import {useAuth} from "../../utils/auth";
 import {useNavigate} from "react-router-dom";
+import {TICons} from "@ya.praktikum/react-developer-burger-ui-components/dist/ui/icons";
 
-function Login() {
-    /*const [login, setLogin] = React.useState('')
-    const [password, setPassword] = React.useState('')*/
-    const [passwordShowed, setPasswordShowed] = React.useState(false)
-    const [passwordIconState, setPasswordIconState] = React.useState('HideIcon')
-    const [passwordFieldType, setPasswordFieldType] = React.useState('password')
-    const auth = useAuth()
-    const navigate = useNavigate()
+
+function Registration() {
+    let auth = useAuth()
     const [credentials, setCredentials] = useState({
+        name: '',
         email: '',
         password: '',
     });
-
-
-    async function signIn(e) {
-        try {
-            e.preventDefault()
-            await auth.signIn(credentials);
-            navigate("/")
-
-        } catch (error) {
-            console.error("Error:", error.message);
-        }
-    }
-
-    function onChange(e) {
+    const navigate = useNavigate()
+    function onChange(e: React.ChangeEvent<HTMLInputElement>) {
         const {name, value} = e.target;
         setCredentials((prevState) => ({
             ...prevState,
@@ -37,7 +22,9 @@ function Login() {
         }));
     }
 
-
+    const [passwordShowed, setPasswordShowed] = React.useState(false)
+    const [passwordIconState, setPasswordIconState] = React.useState< keyof TICons | undefined>('HideIcon')
+    const [passwordFieldType, setPasswordFieldType] = React.useState< "email" | "password" | "text" | undefined>('password')
     useEffect(() => {
             if (passwordShowed) {
                 setPasswordIconState('HideIcon')
@@ -51,13 +38,38 @@ function Login() {
 
     return (
         <div className={loginStyles.gridWrapper}>
-
             <div className={loginStyles.centralBox}>
                 <div className={loginStyles.flexedCenterColumn}>
                     <p className="text text_type_main-large">
-                        Вход
+                        Регистрация
                     </p>
-                    <form onSubmit={signIn} className={loginStyles.flexedCenterColumn}>
+                    <form onSubmit={(e) => {
+                        console.log("submit button pressed")
+                        auth.registerUser(credentials).then(x => {
+                                alert("resistration successfull!")
+                                navigate('/')
+                            }
+                        ).catch(e => {
+                            alert("can not register with provided credentials!")
+                            console.log(e)
+                        })
+                        e.preventDefault();
+                    }
+
+                    } className={loginStyles.flexedCenterColumn}>
+                        <div className={loginStyles.marginTop20px}>
+                            <Input
+                                type={'text'}
+                                placeholder={'Name'}
+                                onChange={e => onChange(e)}
+                                value={credentials.name}
+                                name={'name'}
+                                error={false}
+                                errorText={'Ошибка'}
+                                size={'default'}
+                                extraClass="ml-1"
+                            />
+                        </div>
                         <div className={loginStyles.marginTop20px}>
                             <Input
                                 type={'email'}
@@ -74,7 +86,7 @@ function Login() {
                         <div className={loginStyles.marginTop20px}>
                             <Input
                                 type={passwordFieldType}
-                                placeholder={'Пароль'}
+                                placeholder={'Password'}
                                 onChange={e => onChange(e)}
                                 icon={passwordIconState}
                                 value={credentials.password}
@@ -94,19 +106,15 @@ function Login() {
                             />
                         </div>
                         <div className={loginStyles.marginTop20px}>
-                            <Button htmlType="submit" type="primary" size="large">
-                                Войти
+                            <Button
+                                htmlType="submit" type="primary" size="large">
+                                Зарегистрироваться
                             </Button>
                         </div>
                     </form>
                     <div className={loginStyles.marginTop80px}>
                         <p className="text text_type_main-default">
-                            Вы - новый пользователь? <a href="/register"> Зарегистрироваться </a>
-                        </p>
-                    </div>
-                    <div className={loginStyles.marginTop20px}>
-                        <p className="text text_type_main-default">
-                            Забыли пароль? <a href="/forgot-password"> Восстановить </a>
+                            Уже зарегистрированы? <a href="/login"> Войти </a>
                         </p>
                     </div>
                 </div>
@@ -117,4 +125,5 @@ function Login() {
 }
 
 
-export default Login;
+export default Registration
+;

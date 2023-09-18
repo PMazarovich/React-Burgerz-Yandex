@@ -1,19 +1,35 @@
-import React, {useEffect, useState} from 'react';
-import loginStyles from './registration.module.css'
-import {Button, HideIcon, Input, ShowIcon} from "@ya.praktikum/react-developer-burger-ui-components";
+import React, {SyntheticEvent, useEffect, useState} from 'react';
+import loginStyles from './login.module.css'
+import {Button, Input} from "@ya.praktikum/react-developer-burger-ui-components";
 import {useAuth} from "../../utils/auth";
 import {useNavigate} from "react-router-dom";
+import {ILoginCredentials} from "../../utils/Interfaces";
+import {TICons} from "@ya.praktikum/react-developer-burger-ui-components/dist/ui/icons";
 
-
-function Registration() {
-    let auth = useAuth()
-    const [credentials, setCredentials] = useState({
-        name: '',
+function Login() {
+    /*const [login, setLogin] = React.useState('')
+    const [password, setPassword] = React.useState('')*/
+    const [passwordShowed, setPasswordShowed] = React.useState<boolean>(false)
+    const [passwordIconState, setPasswordIconState] = React.useState<keyof TICons | undefined>('HideIcon')
+    const [passwordFieldType, setPasswordFieldType] = React.useState<"password" | "email" | "text" | undefined>('password')
+    const auth = useAuth()
+    const navigate = useNavigate()
+    const [credentials, setCredentials] = useState<ILoginCredentials>({
         email: '',
         password: '',
     });
-    const navigate = useNavigate()
-    function onChange(e) {
+
+    async function signIn(e: SyntheticEvent): Promise<void> {
+        try {
+            e.preventDefault()
+            await auth.signIn(credentials);
+            navigate("/")
+        } catch (error: any) { // ???
+            console.error("Error:", error.message);
+        }
+    }
+
+    function onChange(e: React.ChangeEvent<HTMLInputElement>) {
         const {name, value} = e.target;
         setCredentials((prevState) => ({
             ...prevState,
@@ -21,9 +37,7 @@ function Registration() {
         }));
     }
 
-    const [passwordShowed, setPasswordShowed] = React.useState(false)
-    const [passwordIconState, setPasswordIconState] = React.useState('HideIcon')
-    const [passwordFieldType, setPasswordFieldType] = React.useState('password')
+
     useEffect(() => {
             if (passwordShowed) {
                 setPasswordIconState('HideIcon')
@@ -37,38 +51,13 @@ function Registration() {
 
     return (
         <div className={loginStyles.gridWrapper}>
+
             <div className={loginStyles.centralBox}>
                 <div className={loginStyles.flexedCenterColumn}>
                     <p className="text text_type_main-large">
-                        Регистрация
+                        Вход
                     </p>
-                    <form onSubmit={(e) => {
-                        console.log("submit button pressed")
-                        auth.registerUser(credentials).then(x => {
-                                alert("resistration successfull!")
-                                navigate('/')
-                            }
-                        ).catch(e => {
-                            alert("can not register with provided credentials!")
-                            console.log(e)
-                        })
-                        e.preventDefault();
-                    }
-
-                    } className={loginStyles.flexedCenterColumn}>
-                        <div className={loginStyles.marginTop20px}>
-                            <Input
-                                type={'text'}
-                                placeholder={'Name'}
-                                onChange={e => onChange(e)}
-                                value={credentials.name}
-                                name={'name'}
-                                error={false}
-                                errorText={'Ошибка'}
-                                size={'default'}
-                                extraClass="ml-1"
-                            />
-                        </div>
+                    <form onSubmit={signIn} className={loginStyles.flexedCenterColumn}>
                         <div className={loginStyles.marginTop20px}>
                             <Input
                                 type={'email'}
@@ -85,7 +74,7 @@ function Registration() {
                         <div className={loginStyles.marginTop20px}>
                             <Input
                                 type={passwordFieldType}
-                                placeholder={'Password'}
+                                placeholder={'Пароль'}
                                 onChange={e => onChange(e)}
                                 icon={passwordIconState}
                                 value={credentials.password}
@@ -105,15 +94,19 @@ function Registration() {
                             />
                         </div>
                         <div className={loginStyles.marginTop20px}>
-                            <Button
-                                htmlType="submit" type="primary" size="large">
-                                Зарегистрироваться
+                            <Button htmlType="submit" type="primary" size="large">
+                                Войти
                             </Button>
                         </div>
                     </form>
                     <div className={loginStyles.marginTop80px}>
                         <p className="text text_type_main-default">
-                            Уже зарегистрированы? <a href="/login"> Войти </a>
+                            Вы - новый пользователь? <a href="/register"> Зарегистрироваться </a>
+                        </p>
+                    </div>
+                    <div className={loginStyles.marginTop20px}>
+                        <p className="text text_type_main-default">
+                            Забыли пароль? <a href="/forgot-password"> Восстановить </a>
                         </p>
                     </div>
                 </div>
@@ -124,5 +117,4 @@ function Registration() {
 }
 
 
-export default Registration
-;
+export default Login;

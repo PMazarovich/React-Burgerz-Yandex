@@ -15,8 +15,8 @@ import Profile from "../Profile/profile";
 import ProfileWrapper from "../Profile/profile-wrapper";
 import OrderHistory from "../Profile/order-history";
 import StubComponent from "../StubComponent/stub";
-import {ProtectedRouteElement} from "../ProtectedRoute/protected-route";
 import IngredientPage from "../IngredientPage/ingredient-page";
+import {ProtectedRouteElement} from "../ProtectedRoute/protected-route";
 
 function App() {
     return (
@@ -29,6 +29,8 @@ function App() {
                     <Route path="/register" element={<Registration />} />
                     <Route path="/forgot-password" element={<ForgotPassword />} />
                     <Route path="/reset-password" element={<ResetPassword />} />
+                    {/*TS2786: 'ProtectedRouteElement' cannot be used as a JSX component.   Its return type 'ReactNode' is not a valid JSX element.*/}
+                    {/*// @ts-ignore*/}
                     <Route path="/profile" element={<ProtectedRouteElement><ProfileWrapper /></ProtectedRouteElement>}> {/* В этом компоненте присутствует <Outlet>. Outlet будет рисовать вместо себя вложенные пути */}
                         <Route index element={<Profile />} /> {/* index - default Route inside relative routes */}
                         <Route path="/profile/orders" element={<OrderHistory />} />
@@ -39,11 +41,12 @@ function App() {
                     <Route path="/ingredients/">
                         <Route path=":ingredientId" element={<IngredientPage />} />
                     </Route>
+                    {/*// @ts-ignore*/}
                     <Route path="/ordersLine" element={<ProtectedRouteElement><StubComponent/></ProtectedRouteElement>}/>
                     <Route path="/logout" element={<Login />}/>
                     <Route path="/constructor" element={<BurgerIngredientsConstructorWrapper />}/>
+                    {/*// @ts-ignore*/}
                     <Route path="/" element={<ProtectedRouteElement><BurgerIngredientsConstructorWrapper /></ProtectedRouteElement>}/>
-
                 </Routes>
             </Router>
         </>

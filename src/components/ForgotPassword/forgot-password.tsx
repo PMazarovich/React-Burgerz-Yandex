@@ -5,10 +5,9 @@ import {restorePassword} from "../../utils/burger-api";
 import {useNavigate} from "react-router-dom";
 
 function ForgotPassword() {
-    const [email, setEmail] = React.useState('')
+    const [email, setEmail] = React.useState<string>('')
     const navigate = useNavigate()
     async function restore(){
-        console.log(email)
         restorePassword(email).then(() => {
             navigate('/reset-password')}).catch(e =>{
             alert("error, check console")

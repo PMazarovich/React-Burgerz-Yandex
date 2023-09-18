@@ -15,13 +15,14 @@ export interface IIngredient{
     image_large: string;
     __v: number;
 }
-
 export interface IFoodContainer extends Omit<IIngredient, "_id" | "__v" | "price" | "image_large" | "image" | "image_mobile" | "type"> {
     ingredientId: string;
     price?: number; // This is optional, so use "?"
     imgSrc: string;
     imgAlt: string;
 }
+
+export interface IIngredientDetailsModal extends Omit<IFoodContainer, "price" | "ingredientId">{}
 
 export interface IConstructorState extends IIngredient{
     bun: string
