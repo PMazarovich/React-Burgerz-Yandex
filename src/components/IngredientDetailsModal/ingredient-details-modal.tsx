@@ -1,7 +1,5 @@
 import React from 'react';
-import PropTypes from "prop-types";
 import ingredientDetailsStyles from './ingredient-details.module.css'
-import {foodIngredientsPropTypes} from '../../utils/prop-types'
 import {IIngredientDetailsModal} from "../../utils/Interfaces";
 
 function TextDetailsContainer({name, value}: {name: string, value: string | number}){
@@ -32,6 +30,5 @@ function IngredientDetailsModal({imgSrc, imgAlt, name, proteins, fat, carbohydra
 
     );
 }
-IngredientDetailsModal.propTypes = foodIngredientsPropTypes
 
 export default IngredientDetailsModal;

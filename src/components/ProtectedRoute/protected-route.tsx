@@ -6,7 +6,7 @@ import {Navigate} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {authActions} from "../../store/reducers/AuthSlice";
 
-export function ProtectedRouteElement({ children }: {children: React.ReactNode}): React.ReactNode {
+export function ProtectedRouteElement({ children }: {children: React.ReactNode}): React.ReactElement {
     // Вернём из хранилища запрос на получение данных о пользователе и текущий объект с пользователем
     let auth = useAuth();
     const [isUserLoaded, setUserLoaded] = useState(false);
@@ -46,7 +46,7 @@ export function ProtectedRouteElement({ children }: {children: React.ReactNode})
 
     if (userLoggedIn) {
         // Если user есть, возвращаем элемент, который был в аргументах ProtectedRoute
-        return children;
+        return children as React.ReactElement<any, string | React.JSXElementConstructor<any>>;
     } else { // Если user нет, то перенаправляем его обратно на login
         return <Navigate to="/login" replace />;
     }

@@ -1,7 +1,7 @@
 import exp from "constants";
 import PropTypes from "prop-types";
 
-export interface IIngredient{
+export interface IIngredient {
     _id: string;
     name: string;
     type: string;
@@ -15,6 +15,12 @@ export interface IIngredient{
     image_large: string;
     __v: number;
 }
+
+export interface IGetIngredientsResponse {
+    data: Array<IIngredient>
+    success: boolean
+}
+
 export interface IFoodContainer extends Omit<IIngredient, "_id" | "__v" | "price" | "image_large" | "image" | "image_mobile" | "type"> {
     ingredientId: string;
     price?: number; // This is optional, so use "?"
@@ -22,11 +28,13 @@ export interface IFoodContainer extends Omit<IIngredient, "_id" | "__v" | "price
     imgAlt: string;
 }
 
-export interface IIngredientDetailsModal extends Omit<IFoodContainer, "price" | "ingredientId">{}
+export interface IIngredientDetailsModal extends Omit<IFoodContainer, "price" | "ingredientId"> {
+}
 
-export interface IConstructorState extends IIngredient{
+export interface IConstructorState extends IIngredient {
     bun: string
 }
+
 //////////////////////////////API///////////////////////////////
 
 export interface IUserResponse {
@@ -42,11 +50,12 @@ export interface ILoginCredentials {
     password: string;
 }
 
-export interface IAuthResponse extends IUserResponse{
+export interface IAuthResponse extends IUserResponse {
     accessToken: string;
     refreshToken: string;
 }
-export interface IUserRegistration extends ILoginCredentials{
+
+export interface IUserRegistration extends ILoginCredentials {
     name: string;
 }
 
@@ -55,11 +64,12 @@ export interface INewRefreshTokenResponse extends Omit<IAuthResponse, "user"> {
     // except for the 'user' property.
 }
 
-export interface ILogoutResponse{
+export interface ILogoutResponse {
     success: boolean
     message: string
 }
+
 ////////////////////////////////////////COMPONENTS/////////////////////////////
-export interface IBurgerIngredients{
+export interface IBurgerIngredients {
     setIngredientDragging: (value: boolean) => void;
 }

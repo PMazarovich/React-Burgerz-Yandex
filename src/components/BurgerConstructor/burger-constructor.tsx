@@ -146,7 +146,7 @@ function ConstructorElementWrapper({
     })
     drag(drop(ref))
     return (
-        <div ref={ref} data-handler-id={handlerId} className={constructorStyles.wrapper}>
+        <div ref={ref} data-handler-id={handlerId} className={constructorStyles.gridWrapper}>
             <div className={constructorStyles.dragIconStyle}>
                 <DragIcon type="primary"/>
             </div>

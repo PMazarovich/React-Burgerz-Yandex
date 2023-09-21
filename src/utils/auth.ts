@@ -2,6 +2,7 @@ import {getNewAccessToken, getUserRequest, loginRequest, logout, registerRequest
 import {authActions} from "../store/reducers/AuthSlice";
 import {useDispatch} from "react-redux";
 import {deleteCookie, extractBearerToken, getCookie, setCookie} from "./utils";
+import {IAuthResponse, ILoginCredentials, IUserRegistration} from "./Interfaces";
 
 // login ReactBurgerzUzer
 // email HeNZPQZyofer8K63YovU1BsKl8fGqCkd@test.com
@@ -14,13 +15,11 @@ import {deleteCookie, extractBearerToken, getCookie, setCookie} from "./utils";
 export function useAuth() {
     const dispatch = useDispatch()
 
-    function saveAuthInfo(type, message) {
+    function saveAuthInfo(type: string, message: IAuthResponse) {
         if (message.success) {
-            // Сохраним  accessToken в куки и сделаем протухание через 20 минут
+            // Сохраним accessToken в куки и сделаем протухание через 20 минут
             setCookie('accessToken', extractBearerToken(message.accessToken), {expires: 6000}); // 10 минут
             // Поместим в хранилище браузера refreshToken
-            console.log("setting refresh")
-            console.log(message.refreshToken)
             setCookie('refreshToken', message.refreshToken, {expires: 60000})
             // Сохраним в redux созданного пользователя.
             dispatch(authActions.userLoggedIn({
@@ -35,12 +34,10 @@ export function useAuth() {
         }
     }
 
-    async function signIn(signInMessage) {
+    async function signIn(signInMessage: ILoginCredentials) {
         // api call to /login
         try {
             const data = await loginRequest(signInMessage); // Execution will pause here until the promise is resolved
-            console.log("LOGGED IN")
-            console.log(data)
             saveAuthInfo("login", data);
         } catch (e) {
             alert("A signIn error occurred, see console for details");
@@ -48,10 +45,10 @@ export function useAuth() {
         }
     }
 
-    async function registerUser(registerMessage) {
+    async function registerUser(registerMessage: IUserRegistration): Promise<void> {
         // посылаем api запрос на регистрацию
-        registerRequest(registerMessage).then(resp => {
-            resp.password = registerMessage.password
+        registerRequest(registerMessage).then((resp: IAuthResponse) => {
+            //resp.password = registerMessage.password
             saveAuthInfo("registration", resp)
         }).catch(e => {
             alert("an error occured during registration, see console")
@@ -86,14 +83,16 @@ export function useAuth() {
 
     async function signOut() {
         try {
-            let token = getCookie('refreshToken')
-            await logout(token);
-            // Удаляем пользователя из cookie
-            deleteCookie('refreshToken');
-            // Удаляем пользователя из redux
-            dispatch(authActions.userLoggedOut())
-            // Удаляем куку token
-            deleteCookie('accessToken');
+            let token: string | undefined = getCookie('refreshToken')
+            if (token) {
+                await logout(token);
+                // Удаляем пользователя из cookie
+                deleteCookie('refreshToken');
+                // Удаляем пользователя из redux
+                dispatch(authActions.userLoggedOut())
+                // Удаляем куку token
+                deleteCookie('accessToken');
+            }
         } catch (e) {
             throw e
         }

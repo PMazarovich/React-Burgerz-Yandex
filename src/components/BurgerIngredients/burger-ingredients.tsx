@@ -2,9 +2,7 @@ import React, {ForwardedRef, ReactNode, useEffect, useRef} from 'react';
 import {CurrencyIcon, Tab} from "@ya.praktikum/react-developer-burger-ui-components";
 import burgerIngredientsStyles from './burger-ingredients.module.css'
 import counterImage from '../../images/counterIcon.png'
-import PropTypes from "prop-types";
 import IngredientDetailsModal from "../IngredientDetailsModal/ingredient-details-modal";
-import {foodIngredientsPropTypes} from "../../utils/prop-types";
 import {useDispatch, useSelector} from "react-redux";
 import {useDrag} from "react-dnd";
 import {useNavigate} from "react-router-dom";

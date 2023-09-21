@@ -1,6 +1,6 @@
 import {getCookie} from "./utils";
 import {
-    IAuthResponse,
+    IAuthResponse, IGetIngredientsResponse,
     IIngredient,
     ILoginCredentials,
     ILogoutResponse,
@@ -14,14 +14,13 @@ let NORMA_API = "https://norma.nomoreparties.space/api"
 /* we need this function as there may be some cases when we can do some summary basing only on status code (201, 202 etc)
 * That's why it is better to parse json in the separate function just like we do with checkReponseStatusCode
 *  */
-// todo here it can be any type of all response types. fill this later
-async function parseJsonFromResponse(response: Response): Promise<any> {  // todo return type!
-    const data: any = await response.json();
-    if (data.error) {
-        throw new Error("failed to parse json", data.error);
-    } else {
-        return data
-    }
+async function parseJsonFromResponse<T>(response: Response): Promise<T> {
+    // ВАЖНО. Всегда использовать синтаксис .then.catch.finally
+    return response.json().then((extractedJson: T) => {
+        return extractedJson
+    }).catch(e => {
+        throw new Error("failed to parse json", e.error);
+    })
 }
 function checkReponseStatusCode(response: Response): Response {
     if (response.ok) { /* status codes: 200-299 */
@@ -34,7 +33,7 @@ function checkReponseStatusCode(response: Response): Response {
 
 async function getIngredients(): Promise<Array<IIngredient>> {
     const response: Response = await fetch(`${NORMA_API}/ingredients`);
-    const extractedJson = await parseJsonFromResponse(checkReponseStatusCode(response))
+    const extractedJson = await parseJsonFromResponse<IGetIngredientsResponse>(checkReponseStatusCode(response))
     return extractedJson.data
 }
 
@@ -49,7 +48,7 @@ async function postOrder(order: Array<string>): Promise<number> { /* This return
         body: JSON.stringify({"ingredients": order})
     });
 
-    return await parseJsonFromResponse(checkReponseStatusCode(response))
+    return await parseJsonFromResponse<number>(checkReponseStatusCode(response))
 }
 
 
@@ -91,7 +90,7 @@ async function getUserRequest(): Promise<IUserResponse> {
         redirect: 'follow',
         referrerPolicy: 'no-referrer'
     })
-    let res = await parseJsonFromResponse(checkReponseStatusCode(response))
+    let res = await parseJsonFromResponse<IUserResponse>(checkReponseStatusCode(response))
     return res
 }
 
@@ -105,7 +104,7 @@ async function loginRequest(creds: ILoginCredentials): Promise<IAuthResponse> {
         body: JSON.stringify(creds)
     });
     console.log("loginRequest was made")
-    return await parseJsonFromResponse(checkReponseStatusCode(response))
+    return await parseJsonFromResponse<IAuthResponse>(checkReponseStatusCode(response))
 
 }
 
@@ -124,11 +123,11 @@ async function registerRequest(registerRequest: IUserRegistration): Promise<IAut
         referrerPolicy: 'no-referrer',
         body: JSON.stringify(registerRequest)
     });
-    let extractedJson = await parseJsonFromResponse(checkReponseStatusCode(response))
+    let extractedJson = await parseJsonFromResponse<IAuthResponse>(checkReponseStatusCode(response))
     return extractedJson
 }
 
-async function getNewAccessToken(refreshToken: string): Promise<INewRefreshTokenResponse> {
+async function getNewAccessToken(refreshToken: string): Promise<string> {
     const response: Response = await fetch(`${NORMA_API}/auth/token`, {
         method: 'POST',
         mode: 'cors',
@@ -141,7 +140,7 @@ async function getNewAccessToken(refreshToken: string): Promise<INewRefreshToken
         referrerPolicy: 'no-referrer',
         body: JSON.stringify({"token": refreshToken})
     });
-    let extractedJson = await parseJsonFromResponse(checkReponseStatusCode(response))
+    let extractedJson = await parseJsonFromResponse<INewRefreshTokenResponse>(checkReponseStatusCode(response))
     return extractedJson.accessToken
 }
 
@@ -164,7 +163,7 @@ async function logout(refreshToken: string): Promise<ILogoutResponse> {
       "message": "Successful logout"
       }
     * */
-    let extractedJson = await parseJsonFromResponse(checkReponseStatusCode(response))
+    let extractedJson = await parseJsonFromResponse<ILogoutResponse>(checkReponseStatusCode(response))
     return extractedJson
 }
 
@@ -182,11 +181,11 @@ async function fetchIngredientById(id: string): Promise<IIngredient> {
         redirect: 'follow',
         referrerPolicy: 'no-referrer',
     })
-    let extractedJson = await parseJsonFromResponse(checkReponseStatusCode(response))
+    let extractedJson = await parseJsonFromResponse<IIngredient>(checkReponseStatusCode(response))
     return extractedJson
 }
 
-async function updateUser(name: string, email: string, password: string){ // todo check what will be returned
+async function updateUser(name: string, email: string, password: string): Promise<IUserResponse>{ // todo check what will be returned
     const response = await fetch(`${NORMA_API}/auth/user`, {
         method: 'PATCH',
         mode: 'cors',
@@ -204,7 +203,7 @@ async function updateUser(name: string, email: string, password: string){ // tod
             "name": name
         } )
     });
-    let extractedJson = await parseJsonFromResponse(checkReponseStatusCode(response))
+    let extractedJson = await parseJsonFromResponse<IUserResponse>(checkReponseStatusCode(response))
     return extractedJson
 }
 
@@ -214,4 +213,3 @@ export {
     loginRequest, parseJsonFromResponse, checkReponseStatusCode, registerRequest,
     getNewAccessToken, logout, updateUser
 }
-

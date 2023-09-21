@@ -21,11 +21,11 @@ function Login() {
 
     async function signIn(e: SyntheticEvent): Promise<void> {
         try {
-            e.preventDefault()
+            e.preventDefault();
             await auth.signIn(credentials);
-            navigate("/")
-        } catch (error: any) { // ???
-            console.error("Error:", error.message);
+            navigate("/");
+        } catch (error) {
+            console.error("Error:", (error as Error).message);
         }
     }
 

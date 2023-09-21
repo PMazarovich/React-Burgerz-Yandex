@@ -9,7 +9,6 @@ import {ingredientsActions} from "../../store/reducers/IngredientsListSlice";
 import {getIngredients} from "../../utils/burger-api";
 import {IIngredient} from "../../utils/Interfaces";
 
-// todo why it fetch ingredients every time we go to this page?
 function BurgerIngredientsConstructorWrapper() { /* this component just adds a pretty message if there is no data from server */
     const { ingredients } = useSelector((state: any) => ({
         ingredients: state.ingredientsState.ingredients,
