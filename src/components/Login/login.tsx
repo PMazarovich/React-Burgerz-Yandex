@@ -1,35 +1,35 @@
-import React, {useEffect, useState} from 'react';
+import React, {SyntheticEvent, useEffect, useState} from 'react';
 import loginStyles from './login.module.css'
-import {Button, HideIcon, Input, ShowIcon} from "@ya.praktikum/react-developer-burger-ui-components";
+import {Button, Input} from "@ya.praktikum/react-developer-burger-ui-components";
 import {useAuth} from "../../utils/auth";
 import {useNavigate} from "react-router-dom";
+import {ILoginCredentials} from "../../utils/Interfaces";
+import {TICons} from "@ya.praktikum/react-developer-burger-ui-components/dist/ui/icons";
 
 function Login() {
     /*const [login, setLogin] = React.useState('')
     const [password, setPassword] = React.useState('')*/
-    const [passwordShowed, setPasswordShowed] = React.useState(false)
-    const [passwordIconState, setPasswordIconState] = React.useState('HideIcon')
-    const [passwordFieldType, setPasswordFieldType] = React.useState('password')
+    const [passwordShowed, setPasswordShowed] = React.useState<boolean>(false)
+    const [passwordIconState, setPasswordIconState] = React.useState<keyof TICons | undefined>('HideIcon')
+    const [passwordFieldType, setPasswordFieldType] = React.useState<"password" | "email" | "text" | undefined>('password')
     const auth = useAuth()
     const navigate = useNavigate()
-    const [credentials, setCredentials] = useState({
+    const [credentials, setCredentials] = useState<ILoginCredentials>({
         email: '',
         password: '',
     });
 
-
-    async function signIn(e) {
+    async function signIn(e: SyntheticEvent): Promise<void> {
         try {
-            e.preventDefault()
+            e.preventDefault();
             await auth.signIn(credentials);
-            navigate("/")
-
+            navigate("/");
         } catch (error) {
-            console.error("Error:", error.message);
+            console.error("Error:", (error as Error).message);
         }
     }
 
-    function onChange(e) {
+    function onChange(e: React.ChangeEvent<HTMLInputElement>) {
         const {name, value} = e.target;
         setCredentials((prevState) => ({
             ...prevState,

@@ -15,8 +15,8 @@ import Profile from "../Profile/profile";
 import ProfileWrapper from "../Profile/profile-wrapper";
 import OrderHistory from "../Profile/order-history";
 import StubComponent from "../StubComponent/stub";
-import {ProtectedRouteElement} from "../ProtectedRoute/protected-route";
 import IngredientPage from "../IngredientPage/ingredient-page";
+import {ProtectedRouteElement} from "../ProtectedRoute/protected-route";
 
 function App() {
     return (
@@ -43,7 +43,6 @@ function App() {
                     <Route path="/logout" element={<Login />}/>
                     <Route path="/constructor" element={<BurgerIngredientsConstructorWrapper />}/>
                     <Route path="/" element={<ProtectedRouteElement><BurgerIngredientsConstructorWrapper /></ProtectedRouteElement>}/>
-
                 </Routes>
             </Router>
         </>

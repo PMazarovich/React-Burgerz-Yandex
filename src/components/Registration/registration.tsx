@@ -3,6 +3,7 @@ import loginStyles from './registration.module.css'
 import {Button, HideIcon, Input, ShowIcon} from "@ya.praktikum/react-developer-burger-ui-components";
 import {useAuth} from "../../utils/auth";
 import {useNavigate} from "react-router-dom";
+import {TICons} from "@ya.praktikum/react-developer-burger-ui-components/dist/ui/icons";
 
 
 function Registration() {
@@ -13,7 +14,7 @@ function Registration() {
         password: '',
     });
     const navigate = useNavigate()
-    function onChange(e) {
+    function onChange(e: React.ChangeEvent<HTMLInputElement>) {
         const {name, value} = e.target;
         setCredentials((prevState) => ({
             ...prevState,
@@ -22,8 +23,8 @@ function Registration() {
     }
 
     const [passwordShowed, setPasswordShowed] = React.useState(false)
-    const [passwordIconState, setPasswordIconState] = React.useState('HideIcon')
-    const [passwordFieldType, setPasswordFieldType] = React.useState('password')
+    const [passwordIconState, setPasswordIconState] = React.useState< keyof TICons | undefined>('HideIcon')
+    const [passwordFieldType, setPasswordFieldType] = React.useState< "email" | "password" | "text" | undefined>('password')
     useEffect(() => {
             if (passwordShowed) {
                 setPasswordIconState('HideIcon')

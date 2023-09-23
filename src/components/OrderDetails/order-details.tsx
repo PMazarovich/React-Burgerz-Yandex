@@ -3,7 +3,7 @@ import checkboxImage from '../../images/checkbox.png'
 import PropTypes from "prop-types";
 import orderDetailsStyle from "./order-details.module.css"
 
-function OrderDetails({orderNumber}) {
+function OrderDetails({orderNumber}: {orderNumber: number}) {
     return (
         <div className={orderDetailsStyle.detailsConteiner}>
             <div className="text text_type_digits-large">{orderNumber}</div>
@@ -15,8 +15,4 @@ function OrderDetails({orderNumber}) {
 
     );
 }
-OrderDetails.propTypes = {
-    orderNumber: PropTypes.number.isRequired,
-}
-
 export default OrderDetails;

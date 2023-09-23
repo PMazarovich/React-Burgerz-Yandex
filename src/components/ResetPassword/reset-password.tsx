@@ -2,13 +2,14 @@ import React, {useEffect} from 'react';
 import resetPassStyles from './reset-password.module.css'
 import {Button, Input} from "@ya.praktikum/react-developer-burger-ui-components";
 import {resetPassword} from "../../utils/burger-api";
+import {TICons} from "@ya.praktikum/react-developer-burger-ui-components/dist/ui/icons";
 
 function ResetPassword() {
     const [token, setToken] = React.useState('')
     const [password, setPassword] = React.useState('')
     const [passwordShowed, setPasswordShowed] = React.useState(false)
-    const [passwordIconState, setPasswordIconState] = React.useState('HideIcon')
-    const [passwordFieldType, setPasswordFieldType] = React.useState('password')
+    const [passwordIconState, setPasswordIconState] = React.useState<keyof TICons | undefined>('HideIcon')
+    const [passwordFieldType, setPasswordFieldType] = React.useState< "password" | "text" | "email" | undefined>('password')
     function resetPass(){
         resetPassword(password, token).then(()=>console.log("password reset successful")).catch(e => {
             console.log(e)

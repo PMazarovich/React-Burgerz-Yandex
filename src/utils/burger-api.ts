@@ -1,20 +1,28 @@
 import {getCookie} from "./utils";
+import {
+    IAuthResponse, IGetIngredientsResponse,
+    IIngredient,
+    ILoginCredentials,
+    ILogoutResponse,
+    INewRefreshTokenResponse,
+    IUserRegistration,
+    IUserResponse
+} from "./Interfaces";
 
 let NORMA_API = "https://norma.nomoreparties.space/api"
 
 /* we need this function as there may be some cases when we can do some summary basing only on status code (201, 202 etc)
 * That's why it is better to parse json in the separate function just like we do with checkReponseStatusCode
 *  */
-async function parseJsonFromResponse(response) { /* taking Response object */
-    const data = await response.json();
-    if (data.error) {
-        throw new Error("failed to parse json", data.error);
-    } else {
-        return data
-    }
+async function parseJsonFromResponse<T>(response: Response): Promise<T> {
+    // ВАЖНО. Всегда использовать синтаксис .then.catch.finally
+    return response.json().then((extractedJson: T) => {
+        return extractedJson
+    }).catch(e => {
+        throw new Error("failed to parse json", e.error);
+    })
 }
-
-function checkReponseStatusCode(response) { /* taking Response object */
+function checkReponseStatusCode(response: Response): Response {
     if (response.ok) { /* status codes: 200-299 */
         return response;
     } else {
@@ -23,15 +31,15 @@ function checkReponseStatusCode(response) { /* taking Response object */
     }
 }
 
-async function getIngredients() { /* This returns Ingredients data OR throws an error */
-    const response = await fetch(`${NORMA_API}/ingredients`);
-    let extractedJson = await parseJsonFromResponse(checkReponseStatusCode(response))
+async function getIngredients(): Promise<Array<IIngredient>> {
+    const response: Response = await fetch(`${NORMA_API}/ingredients`);
+    const extractedJson = await parseJsonFromResponse<IGetIngredientsResponse>(checkReponseStatusCode(response))
     return extractedJson.data
 }
 
 
-async function postOrder(order) { /* This returns order number OR throws an error */
-    const response = await fetch(`${NORMA_API}/orders`, {
+async function postOrder(order: Array<string>): Promise<number> { /* This returns order number OR throws an error */
+    const response: Response = await fetch(`${NORMA_API}/orders`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -39,26 +47,25 @@ async function postOrder(order) { /* This returns order number OR throws an erro
         },
         body: JSON.stringify({"ingredients": order})
     });
-    // noinspection UnnecessaryLocalVariableJS
-    let extractedJson = await parseJsonFromResponse(checkReponseStatusCode(response))
-    return extractedJson
+
+    return await parseJsonFromResponse<number>(checkReponseStatusCode(response))
 }
 
 
 /////////////////////////////////////AUTH///////////////////////////////////////
-async function restorePassword(email){
-    const response = await fetch(`${NORMA_API}/password-reset`,{
+async function restorePassword(email: string): Promise<void>{
+    const response: Response = await fetch(`${NORMA_API}/password-reset`,{
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({"email": email})
     })
-    return await parseJsonFromResponse(checkReponseStatusCode(response))
+    checkReponseStatusCode(response)
 }
 
-async function resetPassword(password, token){
-    const response = await fetch(`${NORMA_API}/password-reset/reset`,{
+async function resetPassword(password: string, token: string): Promise<void>{
+    const response: Response = await fetch(`${NORMA_API}/password-reset/reset`,{
         method: 'POST',
 
         headers: {
@@ -66,12 +73,12 @@ async function resetPassword(password, token){
         },
         body: JSON.stringify({"password": password, "token": token})
     })
-    return await parseJsonFromResponse(checkReponseStatusCode(response))
+    checkReponseStatusCode(response)
 }
 
-async function getUserRequest() {
+async function getUserRequest(): Promise<IUserResponse> {
     // нужно передать запрос только из куков
-    const response = await fetch(`${NORMA_API}/auth/user`, {
+    const response: Response = await fetch(`${NORMA_API}/auth/user`, {
         method: 'GET',
         mode: 'cors',
         cache: 'no-cache',
@@ -83,58 +90,28 @@ async function getUserRequest() {
         redirect: 'follow',
         referrerPolicy: 'no-referrer'
     })
-    // возврат
-    /*
-    {
-    "success": true,
-    "user": {
-        "email": "henzpqzyofer8k63yovu1bskl8fgqckd@test.com",
-        "name": "ReactBurgerzUzer"
-    }
-} */
-    let res = await parseJsonFromResponse(checkReponseStatusCode(response))
+    let res = await parseJsonFromResponse<IUserResponse>(checkReponseStatusCode(response))
     return res
 }
 
-async function loginRequest(form) {
-    /*
-    form = {
-        "email": "",
-        "password": ""
-         }
-    */
+async function loginRequest(creds: ILoginCredentials): Promise<IAuthResponse> {
     console.log("in burger-api.loginRequest")
     const response = await fetch(`https://norma.nomoreparties.space/api/auth/login`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(form)
+        body: JSON.stringify(creds)
     });
     console.log("loginRequest was made")
-    /*{
-         "success": true,
-         "accessToken": "Bearer ...",
-         "refreshToken": "",
-         "user": {
-           "email": "",
-           "name": ""
-         }
-    } */
-
-    return await parseJsonFromResponse(checkReponseStatusCode(response))
+    return await parseJsonFromResponse<IAuthResponse>(checkReponseStatusCode(response))
 
 }
 
-async function registerRequest(registerRequest) {
-    /* form вида = {
-        "email": form.email,
-        "password": form.password,
-        "name": form.name
-    }*/
+async function registerRequest(registerRequest: IUserRegistration): Promise<IAuthResponse> {
     console.log("in registerRequest")
     console.log(registerRequest)
-    const response = await fetch(`${NORMA_API}/auth/register`, {
+    const response: Response = await fetch(`${NORMA_API}/auth/register`, {
         method: 'POST',
         mode: 'cors',
         cache: 'no-cache',
@@ -146,22 +123,12 @@ async function registerRequest(registerRequest) {
         referrerPolicy: 'no-referrer',
         body: JSON.stringify(registerRequest)
     });
-   /* образец ответа
-    {
-        "success": true,
-        "user": {
-        "email": "",
-            "name": ""
-    },
-        "accessToken": "Bearer ...",
-        "refreshToken": ""
-    }*/
-    let extractedJson = await parseJsonFromResponse(checkReponseStatusCode(response))
+    let extractedJson = await parseJsonFromResponse<IAuthResponse>(checkReponseStatusCode(response))
     return extractedJson
 }
 
-async function getNewAccessToken(refreshToken) {
-    const response = await fetch(`${NORMA_API}/auth/token`, {
+async function getNewAccessToken(refreshToken: string): Promise<string> {
+    const response: Response = await fetch(`${NORMA_API}/auth/token`, {
         method: 'POST',
         mode: 'cors',
         cache: 'no-cache',
@@ -173,17 +140,12 @@ async function getNewAccessToken(refreshToken) {
         referrerPolicy: 'no-referrer',
         body: JSON.stringify({"token": refreshToken})
     });
-    let extractedJson = await parseJsonFromResponse(checkReponseStatusCode(response))
-    /*{
-       "success": true,
-       "accessToken": "Bearer ...",
-        "refreshToken": ""
-      } */
+    let extractedJson = await parseJsonFromResponse<INewRefreshTokenResponse>(checkReponseStatusCode(response))
     return extractedJson.accessToken
 }
 
-async function logout(refreshToken) {
-    const response = await fetch(`${NORMA_API}/auth/logout`, {
+async function logout(refreshToken: string): Promise<ILogoutResponse> {
+    const response: Response = await fetch(`${NORMA_API}/auth/logout`, {
         method: 'POST',
         mode: 'cors',
         cache: 'no-cache',
@@ -201,17 +163,12 @@ async function logout(refreshToken) {
       "message": "Successful logout"
       }
     * */
-    let extractedJson = await parseJsonFromResponse(checkReponseStatusCode(response))
-    /*{
-       "success": true,
-       "accessToken": "Bearer ...",
-        "refreshToken": ""
-      } */
+    let extractedJson = await parseJsonFromResponse<ILogoutResponse>(checkReponseStatusCode(response))
     return extractedJson
 }
 
 
-async function fetchIngredientById(id) {
+async function fetchIngredientById(id: string): Promise<IIngredient> {
     const response = await fetch(`${NORMA_API}/ingredients/${id}`, {
         method: 'GET',
         mode: 'cors',
@@ -223,23 +180,12 @@ async function fetchIngredientById(id) {
         },
         redirect: 'follow',
         referrerPolicy: 'no-referrer',
-    });
-    /*
-    * {
-      "success": true,
-      "message": "Successful logout"
-      }
-    * */
-    let extractedJson = await parseJsonFromResponse(checkReponseStatusCode(response))
-    /*{
-       "success": true,
-       "accessToken": "Bearer ...",
-        "refreshToken": ""
-      } */
+    })
+    let extractedJson = await parseJsonFromResponse<IIngredient>(checkReponseStatusCode(response))
     return extractedJson
 }
 
-async function updateUser(name, email, password){
+async function updateUser(name: string, email: string, password: string): Promise<IUserResponse>{ // todo check what will be returned
     const response = await fetch(`${NORMA_API}/auth/user`, {
         method: 'PATCH',
         mode: 'cors',
@@ -257,7 +203,7 @@ async function updateUser(name, email, password){
             "name": name
         } )
     });
-    let extractedJson = await parseJsonFromResponse(checkReponseStatusCode(response))
+    let extractedJson = await parseJsonFromResponse<IUserResponse>(checkReponseStatusCode(response))
     return extractedJson
 }
 
@@ -267,4 +213,3 @@ export {
     loginRequest, parseJsonFromResponse, checkReponseStatusCode, registerRequest,
     getNewAccessToken, logout, updateUser
 }
-
