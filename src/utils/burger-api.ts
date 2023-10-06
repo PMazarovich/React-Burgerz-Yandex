@@ -4,7 +4,7 @@ import {
     IIngredient,
     ILoginCredentials,
     ILogoutResponse,
-    INewRefreshTokenResponse,
+    INewRefreshTokenResponse, ISubmitAnOrderResponse,
     IUserRegistration,
     IUserResponse
 } from "./Interfaces";
@@ -31,14 +31,14 @@ function checkReponseStatusCode(response: Response): Response {
     }
 }
 
-async function getIngredients(): Promise<Array<IIngredient>> {
+async function getIngredientsAPI(): Promise<Array<IIngredient>> {
     const response: Response = await fetch(`${NORMA_API}/ingredients`);
     const extractedJson = await parseJsonFromResponse<IGetIngredientsResponse>(checkReponseStatusCode(response))
     return extractedJson.data
 }
 
 
-async function postOrder(order: Array<string>): Promise<number> { /* This returns order number OR throws an error */
+async function postOrder(order: Array<string>): Promise<ISubmitAnOrderResponse> {
     const response: Response = await fetch(`${NORMA_API}/orders`, {
         method: 'POST',
         headers: {
@@ -48,7 +48,7 @@ async function postOrder(order: Array<string>): Promise<number> { /* This return
         body: JSON.stringify({"ingredients": order})
     });
 
-    return await parseJsonFromResponse<number>(checkReponseStatusCode(response))
+    return await parseJsonFromResponse<ISubmitAnOrderResponse>(checkReponseStatusCode(response))
 }
 
 
@@ -96,7 +96,7 @@ async function getUserRequest(): Promise<IUserResponse> {
 
 async function loginRequest(creds: ILoginCredentials): Promise<IAuthResponse> {
     console.log("in burger-api.loginRequest")
-    const response = await fetch(`https://norma.nomoreparties.space/api/auth/login`, {
+    const response = await fetch(`${NORMA_API}/auth/login`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -209,7 +209,7 @@ async function updateUser(name: string, email: string, password: string): Promis
 
 
 export {
-    postOrder, getIngredients, restorePassword, resetPassword, getUserRequest,
+    postOrder, getIngredientsAPI, restorePassword, resetPassword, getUserRequest,
     loginRequest, parseJsonFromResponse, checkReponseStatusCode, registerRequest,
     getNewAccessToken, logout, updateUser
 }

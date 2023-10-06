@@ -1,19 +1,20 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {Button, ConstructorElement, CurrencyIcon, DragIcon} from "@ya.praktikum/react-developer-burger-ui-components";
 import constructorStyles from './burger-constructor.module.css'
-import OrderDetails from "../OrderDetails/order-details";
+import OrderConfirmedDetails from "../OrderConfirmedDetails/order-confirmed-details";
 import {postOrder} from '../../utils/burger-api'
-import {useDispatch, useSelector} from "react-redux";
 import {constructorActions} from "../../store/reducers/BurgerConstructorSlice";
-import {submitAnOrderActions} from "../../store/reducers/SubmitAnOrderSlice";
+import {submitAnOrderActions, submitAnOrderHandler} from "../../store/reducers/SubmitAnOrderSlice";
 import {useDrag, useDrop} from "react-dnd";
 import classNames from 'classnames';
 //---this is for inner sorting--------//
 import update from "immutability-helper";
 import {IIngredient} from "../../utils/Interfaces";
 import {Modal} from "../Modal/modal";
+import {useAppDispatch, useAppSelector} from "../../utils/hooks";
+import {useNavigate} from "react-router-dom";
 
-function restoreIngredientById(ingredientList: Array<IIngredient>, ingredientId: string): IIngredient {
+export function restoreIngredientById(ingredientList: Array<IIngredient>, ingredientId: string): IIngredient {
     return ingredientList.filter(originalIngredient => originalIngredient._id === ingredientId)[0] // we know that ids are unique, so we can get [0]
 }
 
@@ -25,24 +26,23 @@ function ScrollComponent({
                              distanceFromBottom,
                              children
                          }: { ingredientDragging: boolean, setIngredientDragging: (value: boolean) => void, distanceFromBottom: number, children: React.ReactNode }) {
-    const { /*dragStarted = false,*/ originalIngredients} = useSelector((store: any) => ({
+    const { /*dragStarted = false,*/ originalIngredients} = useAppSelector((store) => ({
         //dragStarted: store.constructorState.dragging,
         originalIngredients: store.ingredientsState.ingredients,
     }))
-    const dispatch = useDispatch()
+    const dispatch = useAppDispatch()
     // ВНИМАНИЕ! ВСЕГДА ПЕРЕДАВАТЬ В ПРИЕМНИК DND ПО ВОЗМОЖНОСТИ ТОЛЬКО ID! ИНАЧЕ ПОВЫШАЕТСЯ СВЯЗАННОСТЬ КОМПОНЕНТОВ
     const [, dropFoodContainerTarget] = useDrop({ // принимаем ID ингредиента из FoodContainer
         accept: ["abstractIngredient"],
-        drop(ingredientId: { ingredientId: string }) { //  Это объект пришедший из FoodContainer. В частности, у него есть поле ingredientId
-            console.log(ingredientId)
+        drop(item: { ingredientId: string }) { //  Это объект пришедший из FoodContainer. В частности, у него есть поле ingredientId
             setIngredientDragging(false)
             //dispatch(constructorActions.dragStopped())
-            restoreIngredientById(originalIngredients, ingredientId.ingredientId)
+            restoreIngredientById(originalIngredients, item.ingredientId)
             // отфильтровываем булки от остальных ингредиентов
-            if (restoreIngredientById(originalIngredients, ingredientId.ingredientId).type !== "bun") {
-                dispatch(constructorActions.addIngredient({payload: ingredientId})) // ВСЕГДА ДЕЛАТЬ ТАК - {payload: ....}
+            if (restoreIngredientById(originalIngredients, item.ingredientId).type !== "bun") {
+                dispatch(constructorActions.addIngredient(item.ingredientId))
             } else {
-                dispatch(constructorActions.addBun(ingredientId))
+                dispatch(constructorActions.addBun(item.ingredientId))
             }
 
         }
@@ -146,8 +146,8 @@ function ConstructorElementWrapper({
     })
     drag(drop(ref))
     return (
-        <div ref={ref} data-handler-id={handlerId} className={constructorStyles.gridWrapper}>
-            <div className={constructorStyles.dragIconStyle}>
+        <div ref={ref} data-handler-id={handlerId} className={constructorStyles.draggableContainer}>
+            <div>
                 <DragIcon type="primary"/>
             </div>
             {children}
@@ -159,18 +159,22 @@ function BurgerConstructor({
                                ingredientDragging,
                                setIngredientDragging
                            }: { ingredientDragging: boolean, setIngredientDragging: (value: boolean) => void }) {
-    const dispatch = useDispatch()
-    const [submittedShowed, setSubmittedShowed] = React.useState(false)
+    const dispatch = useAppDispatch()
+    const navigate = useNavigate()
     const {
         currentIngredientsUUIdsIds,
         originalIngredients,
-        orderNumber,
-        bunIngredientId
-    } = useSelector((store: any) => ({
+        bunIngredientId,
+        userLoggedIn,
+        orderConfirmedNumber,
+        orderConfirmedName,
+    } = useAppSelector((store) => ({
         originalIngredients: store.ingredientsState.ingredients,
         currentIngredientsUUIdsIds: store.constructorState.ingredients,
-        orderNumber: store.submitAnOrderState.orderNumber,
         bunIngredientId: store.constructorState.bun,
+        userLoggedIn: store.authState.userLoggedIn,
+        orderConfirmedNumber: store.submitAnOrderState.orderNumber,
+        orderConfirmedName: store.submitAnOrderState.name
     }))
 
     interface ICurrentIngredients extends IIngredient {
@@ -179,6 +183,7 @@ function BurgerConstructor({
 
     // Восстановим ингредиенты для отрисовки в Constructor исходя из тех ingredientId, которые в данный момент в constructorStore
     let currentIngredients: Array<ICurrentIngredients> = []
+    console.log(currentIngredientsUUIdsIds)
     if (currentIngredientsUUIdsIds.length !== 0) {
         // iterate over all currentIngredientsUUIdsIds and resurrect ingredients in constructor based on current ingredients id and original ingredients
         for (let ingredientUuidId of currentIngredientsUUIdsIds) {
@@ -191,27 +196,17 @@ function BurgerConstructor({
     }
 
     function submitAnOrder() {
-        // готовим request
-        let ids: Array<string> = [bunIngredientId] // first and last ingredient Id should be buns. Order is important for sending to the server
-        // todo this is "any" as these fetched from state. Ans we did not do anything with redux store types
-        ids = ids.concat(currentIngredientsUUIdsIds.flatMap((x: { ingredientId: any; }) => x.ingredientId))
-        ids.push(bunIngredientId)
-        // Если успех, покажем modal с order. Если успеха нет, выдаем alert с ошибкой
-        dispatch(submitAnOrderActions.sendAnOrder())
-        postOrder(ids).then(x => {
-            dispatch(submitAnOrderActions.orderConfirmed({orderNumber: x}))
-            setSubmittedShowed(true)
-            switchSumbittedShowed()
-        }).catch(e => {
-            console.error("can't create an order with error: ", e)
-            dispatch(submitAnOrderActions.orderFailed({error: e}))
-            setSubmittedShowed(false)
-            alert("can't create an order. See console")
-        })
-    }
-
-    function switchSumbittedShowed() {
-        setSubmittedShowed(!submittedShowed)
+        // если не авторизован - перекинуть на профиль
+        if(!userLoggedIn){
+            navigate('/profile')
+        } else {
+            // готовим request
+            let ids: Array<string> = [bunIngredientId] // first and last ingredient Id should be buns. Order is important for sending to the server
+            ids = ids.concat(currentIngredientsUUIdsIds.flatMap((x: { ingredientId: any; }) => x.ingredientId))
+            ids.push(bunIngredientId)
+            // Выполним thunk! Он сделает запрос и запишет результаты в стор
+            dispatch(submitAnOrderHandler(ids))
+        }
     }
 
     const chosenBun = restoreIngredientById(originalIngredients, bunIngredientId)
@@ -243,6 +238,10 @@ function BurgerConstructor({
     }, []);
 
     /*--------------------------------------------------------------------------------------------------------------------------------------------------------*/
+    function closeModal() {
+        console.log("cosing a modal...")
+        dispatch(submitAnOrderActions.cleanOrderState())
+    }
 
     return (
         <div className={constructorStyles.main}>
@@ -284,11 +283,12 @@ function BurgerConstructor({
                 <Button onClick={submitAnOrder} htmlType="button" type="primary" size="large">
                     Оформить заказ
                 </Button>
+
             </div>
-            {submittedShowed &&
-                <Modal onCloseFunction={switchSumbittedShowed} headerText={"Order confirmed!"}>
-                    <OrderDetails orderNumber={orderNumber}/>
-                </Modal>}
+            {orderConfirmedName !== '' &&
+                <Modal onCloseFunction={closeModal}><OrderConfirmedDetails orderNumber={orderConfirmedNumber}
+                                                                           orderName={orderConfirmedName}/></Modal>
+            }
         </div>
     )
 }

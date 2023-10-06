@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {useDispatch} from "react-redux";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
-import {getIngredients, logout} from "../../utils/burger-api";
 import ingredientPageStyles from './ingredient-page.module.css'
 import {IIngredient} from "../../utils/Interfaces";
+import {useAppDispatch, useAppSelector} from "../../utils/hooks";
+import {store} from "../../store/store";
 
-function TextDetailsContainer({name, value}: {name: string, value: string | number}) {
+function TextDetailsContainer({name, value}: { name: string, value: string | number }) {
     return (
         <div className={ingredientPageStyles.textDetails}>
             <span className={"text_type_main-medium text_color_inactive"}>{name}</span>
@@ -16,38 +16,25 @@ function TextDetailsContainer({name, value}: {name: string, value: string | numb
 
 
 function IngredientPage() {
-    const { ingredientId } = useParams(); // Access the ingredientId parameter from the URL
-    const navigate = useNavigate()
+    const {ingredientId} = useParams(); // Access the ingredientId parameter from the URL
     const [ingredient, setIngredient] = useState<IIngredient | null>(null)
-    const [fetching, setFetching] = useState<boolean>(true)
-    const dispatch = useDispatch()
-    // check if the model was opened. If it was, redirect to '/'
-    useEffect(() => {
-        const ingredientId: string | null = localStorage.getItem('portalOpen');
-        if (ingredientId != null) {
-            navigate('/')
-        }
-    }, [])
-    React.useEffect(() => {
-        setFetching(true)
-        getIngredients().then((ingredients: Array<IIngredient>) => {
-            // console.log(ingredients)
-            // const temp = ingredients.filter(x => x._id === ingredientId)[0]
-            console.log(ingredients.filter(x => x._id === ingredientId)[0])
-            setIngredient(ingredients.filter(x => x._id === ingredientId)[0])
-            setFetching(false)
-        }).catch((err) => {
-            setFetching(false)
-            console.error(err)
-        })
+    const { ingredients, fetching } = useAppSelector((store) => ({
+        ingredients: store.ingredientsState.ingredients,
+        fetching: store.ingredientsState.ingredientsFetching
+    }))
 
-    }, [])
+    React.useEffect(() => {
+        if(!fetching){
+            setIngredient(ingredients.filter(x => x._id === ingredientId)[0])
+        }
+    }, [fetching, ingredientId, ingredients])
 
     if (fetching) {
         return (
-            <span style={{top: '50%', left: '50%', position: 'absolute', transform: 'translate(-50%,-50%)'}} className={ingredientPageStyles.loader}></span>)
+            <span className={ingredientPageStyles.loader}></span>)
     } else {
         return (<div className={ingredientPageStyles.centerColumn}>
+            <span className={'text_type_main-medium text_color_inactive flex-display'}> Детали ингредиента: </span>
             {ingredient && <>
                 <div
                     className={ingredientPageStyles.relative}>

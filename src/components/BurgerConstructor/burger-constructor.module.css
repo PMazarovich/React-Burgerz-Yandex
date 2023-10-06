@@ -6,17 +6,23 @@
     margin-top: 60px;
 }
 
-.gridWrapper{
+.profileWrapper{
     display: flex;
     flex-direction: row;
     margin-top: 15px;
     margin-bottom: 15px;
     margin-right: 15px;
 }
+.draggableContainer{
+    display: flex;
+    align-items: center;
+    margin-right: 5px;
+    margin-top: 10px;
+}
 .dragIconStyle{
     display: flex;
     align-items: center;
-    margin-right: 15px;
+    margin-right: 5px;
 }
 .bottomButtonContainer{
     display: flex;

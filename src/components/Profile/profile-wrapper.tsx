@@ -29,7 +29,7 @@ function ProfileWrapper() {
     }, [currentPath],)
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     return (
-        <div className={profileStyles.gridWrapper}>
+        <div className={profileStyles.profileWrapper}>
             <div className={`${profileStyles.textBoxColumns} ${profileStyles.flexedTextContainer}`}>
                 <Link to='/profile/'
                       className={`${linkStyles.default} ${profileStyles.noUnderline}`}> {/* Link меняет ссылку в адресной строке, а Router после анализа открывает соответствующие страницы */}
@@ -38,12 +38,13 @@ function ProfileWrapper() {
                 <Link to='/profile/orders' className={`${linkStyles.orders} ${profileStyles.noUnderline}`}>
                     История заказов
                 </Link>
-                <div onClick={() => auth.signOut()} style={{backgroundColor: "transparent", cursor:'pointer'}} className={`text text_type_main-medium text_color_inactive ${profileStyles.noUnderline}`}>
+                <div onClick={() => auth.signOut()}  className={`text text_type_main-medium text_color_inactive ${profileStyles.noUnderline} ${profileStyles.exitButton}`}>
                     Выход
                 </div>
             </div>
-
-            <Outlet/> {/*Outlet нарисует вместо себя в этом компоненте все компоненты по пути (они в <Route>) /profile/* См в App.js*/}
+            <div className={profileStyles.flexedRightColumn}>
+                <Outlet/> {/*Outlet нарисует вместо себя в этом компоненте все компоненты по пути (они в <Route>) /profile/* См в App.js*/}
+            </div>
         </div>
 
     )

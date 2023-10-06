@@ -2,12 +2,11 @@ import React, {ForwardedRef, ReactNode, useEffect, useRef} from 'react';
 import {CurrencyIcon, Tab} from "@ya.praktikum/react-developer-burger-ui-components";
 import burgerIngredientsStyles from './burger-ingredients.module.css'
 import counterImage from '../../images/counterIcon.png'
-import IngredientDetailsModal from "../IngredientDetailsModal/ingredient-details-modal";
-import {useDispatch, useSelector} from "react-redux";
 import {useDrag} from "react-dnd";
-import {useNavigate} from "react-router-dom";
+import {Link, useLocation} from "react-router-dom";
 import {IBurgerIngredients, IFoodContainer, IIngredient} from "../../utils/Interfaces";
-import {Modal} from "../Modal/modal";
+import {useAppSelector} from "../../utils/hooks";
+import {restoreIngredientById} from "../BurgerConstructor/burger-constructor";
 
 
 function BurgerIngredients({setIngredientDragging}: IBurgerIngredients) {
@@ -39,9 +38,10 @@ function BurgerIngredients({setIngredientDragging}: IBurgerIngredients) {
     }
 
     //const burgerConstructorState = useContext(CommonDataFromServerContext); // тащим burgerConstructorState из контекста
-    const {ingredients, currentIngredientsIds} = useSelector((store: any) => ({
+    const {ingredients, currentIngredientsIds, selectedBun} = useAppSelector((store) => ({
         ingredients: store.ingredientsState.ingredients,
-        currentIngredientsIds: store.constructorState.ingredients
+        currentIngredientsIds: store.constructorState.ingredients,
+        selectedBun: store.constructorState.bun
     }))
     /* Стараться всё, что можно делать в JS, а результаты уже рендерить в JSX */
     const buns: Array<IIngredient> = ingredients.filter((item: IIngredient) => item.type === 'bun')
@@ -78,9 +78,14 @@ function BurgerIngredients({setIngredientDragging}: IBurgerIngredients) {
         );
     });
 
-    function FoodCounter({ ingredientId }: { ingredientId: string }) { /* this component should be placed inside relative component!*/
+    function FoodCounter({ingredientId}: { ingredientId: string }) { /* this component should be placed inside relative component!*/
         // соберем все совпадения из constructor для данного элемента
         let count: number = currentIngredientsIds.filter((currentIngredientsId: { uuid: string; ingredientId: string; }) => currentIngredientsId.ingredientId === ingredientId).length
+
+        // if current ingredient is bun, then count should be 2
+        if (ingredientId === selectedBun) {
+            count = 2
+        }
         return (
             /* будем скрывать счетчик если количество 0*/
             <div hidden={count <= 0} className={burgerIngredientsStyles.absoluteTop0Right0}> {/* tiny image and text*/}
@@ -98,10 +103,15 @@ function BurgerIngredients({setIngredientDragging}: IBurgerIngredients) {
 
     /*картинка + описание + счетчик + вызов портала с описанием на левый клик*/
 
-    // Этот компонент перетаскиваемый
-    function FoodContainer({ingredientId, imgSrc, imgAlt, name, price, proteins, fat, carbohydrates, calories}: IFoodContainer) {
-        const dispatch = useDispatch();
-        const navigate = useNavigate()
+    // Этот компонент перетаскиваемый и кликабельный. Каждый завернут в Link
+    function FoodContainer({
+                               ingredientId,
+                               imgSrc,
+                               imgAlt,
+                               name,
+                               price,
+                           }: IFoodContainer) {
+        const location = useLocation();
         // ВНИМАНИЕ! ВСЕГДА ПЕРЕДАВАТЬ В ПРИЕМНИК ПО DND ПО ВОЗМОЖНОСТИ ТОЛЬКО ID! ИНАЧЕ ПОВЫШАЕТСЯ СВЯЗАННОСТЬ КОМПОНЕНТОВ
         const [{isDrag}, dragRef] = useDrag({   //<- он возвращает {тут всякие возвращаемые объекты типа monitor.isDragging() и т.д.} и ref компонента, на который повешен этот хук
             type: "abstractIngredient",
@@ -122,62 +132,33 @@ function BurgerIngredients({setIngredientDragging}: IBurgerIngredients) {
             }
         }, [isDrag]);
 
-        const [detailsShowed, setDetailsShowed] = React.useState<boolean>(false)
-        useEffect(() => {
-            const ingredientIdd = localStorage.getItem('portalOpen');
-            if (ingredientIdd != null && ingredientIdd === ingredientId) {
-                switchDetailsShowed(ingredientIdd)
-            } else {
-                setDetailsShowed(false)
-            }
-        }, [])
-
-        function switchDetailsShowed(ingredientId?: string) {
-            console.log("ingredientId IS ", ingredientId)
-            const currentState = window.history.state; // Get the current state
-            console.log(currentState)
-            const newURL: URL = new URL(window.location.href);
-            newURL.pathname = `/ingredients/${ingredientId}`;
-
-            if (!detailsShowed) {
-                setDetailsShowed(true)
-                window.history.pushState(currentState, '', newURL);
-                if (typeof ingredientId === "string") {
-                    localStorage.setItem('portalOpen', ingredientId);
-                }
-            } else {
-                setDetailsShowed(false)
-                navigate('/')
-                localStorage.removeItem('portalOpen');
-            }
-
-        }
 
         return (
-            <>
-                <div ref={dragRef}          // Реф из useDrag
-                     onClick={() => {
-                         switchDetailsShowed(ingredientId)
-                     }} className={burgerIngredientsStyles.foodContainerParent}>
+            <div ref={dragRef}          // Реф из useDrag
+                 className={burgerIngredientsStyles.foodContainerParent}>
+                {/* после того как произошел редирект через link, Router начинает заново поиск и отрисовку необходимого компонента в App. */}
+                <Link
+                    to={{pathname: `/ingredients/${ingredientId}`}}
+                    state={{prevLocationObject: location}}
+                    key={ingredientId}
+                >
+
                     <div
                         className={burgerIngredientsStyles.relative}>{/*parent should be relative so child can be absolute relatively to parent */}
                         {/*In this div we will place the main image AND a counter image with counter inside*/}
                         <img className={'p-3'} src={imgSrc} alt={imgAlt}/> {/*main image*/}
                         <FoodCounter ingredientId={ingredientId}/>
                     </div>
-                    <div className={burgerIngredientsStyles.flexCenter}>
+                </Link>
+                <div className={burgerIngredientsStyles.flexCenter}>
                         <span
                             className={`${burgerIngredientsStyles.marginRight10} text_type_main-default`}>{price}</span>
-                        <CurrencyIcon type="primary"/>
-                    </div>
-                    <span className={"text_type_main-default"}>{name}</span>
+                    <CurrencyIcon type="primary"/>
                 </div>
-                {detailsShowed &&
-                    <Modal onCloseFunction={switchDetailsShowed} headerText={"Ingredient details:"}>
-                        <IngredientDetailsModal calories={calories} name={name} imgAlt={imgAlt} imgSrc={imgSrc}
-                                                proteins={proteins} carbohydrates={carbohydrates} fat={fat}/>
-                    </Modal>}
-            </>
+
+                <span className={"text_type_main-default"}>{name}</span>
+            </div>
+
         );
     }
 
@@ -254,4 +235,4 @@ function BurgerIngredients({setIngredientDragging}: IBurgerIngredients) {
     );
 }
 
-export default BurgerIngredients;
+export default BurgerIngredients

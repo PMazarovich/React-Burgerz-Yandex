@@ -35,7 +35,49 @@ export interface IConstructorState extends IIngredient {
     bun: string
 }
 
-//////////////////////////////API///////////////////////////////
+interface IOwner {
+    name: string;
+    email: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
+interface IOrder {
+    ingredients: IIngredient[];
+    _id: string;
+    owner: IOwner;
+    status: string;
+    name: string;
+    createdAt: string;
+    updatedAt: string;
+    number: number;
+    price: number;
+}
+
+export interface ISubmitAnOrderResponse {
+    success: boolean;
+    name: string;
+    order: IOrder;
+}
+
+export interface IOrderFeed {
+    ingredients: string[];
+    _id: string;
+    status: string;
+    number: number;
+    createdAt: string;
+    updatedAt: string;
+    name? : string
+}
+
+export interface IFeed {
+    success: boolean;
+    orders: IOrderFeed[];
+    total: number;
+    totalToday: number;
+}
+
+//////////////////////////////AUTH///////////////////////////////
 
 export interface IUserResponse {
     success: boolean;

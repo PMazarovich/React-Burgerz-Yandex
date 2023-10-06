@@ -5,6 +5,7 @@ import App from './components/App/App';
 import reportWebVitals from './reportWebVitals';
 import {Provider} from "react-redux";
 import {store} from "./store/store";
+import {Router, BrowserRouter} from "react-router-dom";
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
@@ -12,13 +13,12 @@ const root = ReactDOM.createRoot(
 
 root.render(
     <>
-            <Provider store={store}> {/* это провайдер redux для всего приложения */}
-                {/*Корневой элемент для приложения*/}
+        <Provider store={store}> {/* это провайдер redux для всего приложения */}
+            {/*Корневой элемент для приложения*/}
+            <BrowserRouter>
                 <App/>
-                {/* Корневой элемент для всплывающих окон */}
-                <div id="react-modals"
-                     style={{position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}/>
-            </Provider>
+            </BrowserRouter>
+        </Provider>
     </>
 );
 
