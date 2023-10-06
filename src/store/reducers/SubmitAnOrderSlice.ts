@@ -3,9 +3,16 @@
 * This Slice is responsible for burger constructor operations (add/remove ingredient as example)
 *
 * */
-import {createSlice} from "@reduxjs/toolkit";
+import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 
-const initialState = {
+interface ISubmitAnOrderState {
+    orderNumber: number | null;
+    fetching: boolean;
+    error: string
+}
+
+
+const initialState: ISubmitAnOrderState = {
     orderNumber: null,
     fetching: false,
     error: '',
@@ -15,18 +22,18 @@ export const submitAnOrderSlice = createSlice(
         name: 'constructor',             //ключ, который станет префиксом всех экшенов. Например: type: 'constructor/increment');
         initialState: initialState,
         reducers: {
-            sendAnOrder(state){
+            sendAnOrder(state: ISubmitAnOrderState) {
                 state.fetching = true
             },
-            orderConfirmed(state, action){
+            orderConfirmed(state: ISubmitAnOrderState, action: PayloadAction<number>) {
                 state.fetching = false
-                state.orderNumber = action.payload.orderNumber
+                state.orderNumber = action.payload
                 state.error = ''
             },
-            orderFailed(state, payload){
+            orderFailed(state: ISubmitAnOrderState, action: PayloadAction<string>) {
                 state.fetching = false
                 state.orderNumber = null
-                state.error = payload.error
+                state.error = action.payload
             },
         }
     })

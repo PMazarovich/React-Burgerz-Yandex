@@ -19,7 +19,7 @@ function BurgerIngredientsConstructorWrapper() { /* this component just adds a p
     /* Тащим данные с сервера 1 единственный раз*/
     React.useEffect(() => {
         getIngredients().then((ingredients: Array<IIngredient>) => {
-            dispatch(ingredientsActions.ingredientsFetchingSuccess({ingredients: ingredients}))
+            dispatch(ingredientsActions.ingredientsFetchingSuccess(ingredients))
             setFetching(false)
             setError(false)
         }).catch((err) => {

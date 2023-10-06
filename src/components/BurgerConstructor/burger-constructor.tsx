@@ -40,9 +40,9 @@ function ScrollComponent({
             restoreIngredientById(originalIngredients, ingredientId.ingredientId)
             // отфильтровываем булки от остальных ингредиентов
             if (restoreIngredientById(originalIngredients, ingredientId.ingredientId).type !== "bun") {
-                dispatch(constructorActions.addIngredient({payload: ingredientId})) // ВСЕГДА ДЕЛАТЬ ТАК - {payload: ....}
+                dispatch(constructorActions.addIngredient(ingredientId.ingredientId))
             } else {
-                dispatch(constructorActions.addBun(ingredientId))
+                dispatch(constructorActions.addBun(ingredientId.ingredientId))
             }
 
         }
@@ -199,12 +199,13 @@ function BurgerConstructor({
         // Если успех, покажем modal с order. Если успеха нет, выдаем alert с ошибкой
         dispatch(submitAnOrderActions.sendAnOrder())
         postOrder(ids).then(x => {
-            dispatch(submitAnOrderActions.orderConfirmed({orderNumber: x}))
+            dispatch(submitAnOrderActions.orderConfirmed(x))
+            dispatch(submitAnOrderActions.orderConfirmed(x))
             setSubmittedShowed(true)
             switchSumbittedShowed()
         }).catch(e => {
             console.error("can't create an order with error: ", e)
-            dispatch(submitAnOrderActions.orderFailed({error: e}))
+            dispatch(submitAnOrderActions.orderFailed(e))
             setSubmittedShowed(false)
             alert("can't create an order. See console")
         })

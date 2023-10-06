@@ -18,7 +18,7 @@ function Profile() {
     const [email, setEmail] = React.useState<string>(emaill)
     const [passwordShowed, setPasswordShowed] = React.useState<boolean>(false)
     const [passwordIconState, setPasswordIconState] = React.useState<keyof TICons | undefined>('HideIcon')
-    const [passwordFieldType, setPasswordFieldType] = React.useState< "password" | "email" | "text" | undefined>('password')
+    const [passwordFieldType, setPasswordFieldType] = React.useState<"password" | "email" | "text" | undefined>('password')
     useEffect(() => {
             if (passwordShowed) {
                 setPasswordIconState('HideIcon')
@@ -63,7 +63,7 @@ function Profile() {
             dispatch(authActions.userLoggedIn({
                 name: resp.user.name,
                 email: resp.user.email,
-                userLoggedIn: true
+                userLoggedIn: true,
             }))
         }).catch(err => console.error(err))
     }
@@ -115,16 +115,16 @@ function Profile() {
             </div>
             {showCommitButtons && <div className={profileStyles.buttonFlexedRow}>
                 <Button htmlType="button" type="primary" size="small" extraClass="ml-2" onClick={updateUserr}>
-            Сохранить
-        </Button>
-    <Button htmlType="button" type="primary" size="small" extraClass="ml-2" onClick={resetChanges}>
-        Отмена
-    </Button>
+                    Сохранить
+                </Button>
+                <Button htmlType="button" type="primary" size="small" extraClass="ml-2" onClick={resetChanges}>
+                    Отмена
+                </Button>
 
-</div>}
-</div>
-)
-    ;
+            </div>}
+        </div>
+    )
+        ;
 }
 
 

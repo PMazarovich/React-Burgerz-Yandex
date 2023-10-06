@@ -6,7 +6,6 @@ import {constructorReducers} from "./reducers/BurgerConstructorSlice";
 import {submitAnOrderReducers} from "./reducers/SubmitAnOrderSlice";
 import {authReducers} from "./reducers/AuthSlice";
 
-
 const rootReducer = combineReducers({   // Соберем все reducers в один и передадим потом в rootReducer
     ingredientsState: ingredientsReducers,
     constructorState: constructorReducers,
