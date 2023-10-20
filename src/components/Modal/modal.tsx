@@ -10,11 +10,9 @@ import {ModalOverlay} from "../ModalOverlay/modal-overlay";
 
 export function Modal({
                           children,
-                          headerText,
                           onCloseFunction
                       }: {
     children: React.ReactNode;
-    headerText: string;
     onCloseFunction: (ingredientId?: string) => void;
 }) {
     const modalRoot = document.getElementById("react-modals");
@@ -46,8 +44,6 @@ export function Modal({
                 <div className={modalStyles.modalStyle}>
                     {/* header */}
                     <div className={modalStyles.gridMain}>
-                        <span
-                            className={`${modalStyles.headerGridComponent} text_type_main-medium`}> {headerText} </span>
                         {/*todo pointer does not work on X! */}
                         <div className={modalStyles.closeIcon}><CloseIcon onClick={onCloseFunction} type="primary"/>
                         </div>

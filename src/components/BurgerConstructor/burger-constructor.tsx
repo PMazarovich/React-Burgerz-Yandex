@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {Button, ConstructorElement, CurrencyIcon, DragIcon} from "@ya.praktikum/react-developer-burger-ui-components";
 import constructorStyles from './burger-constructor.module.css'
-import OrderDetails from "../OrderDetails/order-details";
+import OrderConfirmedDetails from "../OrderConfirmedDetails/order-confirmed-details";
 import {postOrder} from '../../utils/burger-api'
 import {useDispatch, useSelector} from "react-redux";
 import {constructorActions} from "../../store/reducers/BurgerConstructorSlice";
@@ -33,16 +33,16 @@ function ScrollComponent({
     // ВНИМАНИЕ! ВСЕГДА ПЕРЕДАВАТЬ В ПРИЕМНИК DND ПО ВОЗМОЖНОСТИ ТОЛЬКО ID! ИНАЧЕ ПОВЫШАЕТСЯ СВЯЗАННОСТЬ КОМПОНЕНТОВ
     const [, dropFoodContainerTarget] = useDrop({ // принимаем ID ингредиента из FoodContainer
         accept: ["abstractIngredient"],
-        drop(ingredientId: { ingredientId: string }) { //  Это объект пришедший из FoodContainer. В частности, у него есть поле ingredientId
-            console.log(ingredientId)
+        drop(item: { ingredientId: string }) { //  Это объект пришедший из FoodContainer. В частности, у него есть поле ingredientId
+            console.log(item)
             setIngredientDragging(false)
             //dispatch(constructorActions.dragStopped())
-            restoreIngredientById(originalIngredients, ingredientId.ingredientId)
+            restoreIngredientById(originalIngredients, item.ingredientId)
             // отфильтровываем булки от остальных ингредиентов
-            if (restoreIngredientById(originalIngredients, ingredientId.ingredientId).type !== "bun") {
-                dispatch(constructorActions.addIngredient(ingredientId.ingredientId))
+            if (restoreIngredientById(originalIngredients, item.ingredientId).type !== "bun") {
+                dispatch(constructorActions.addIngredient(item.ingredientId))
             } else {
-                dispatch(constructorActions.addBun(ingredientId.ingredientId))
+                dispatch(constructorActions.addBun(item.ingredientId))
             }
 
         }
@@ -193,25 +193,23 @@ function BurgerConstructor({
     function submitAnOrder() {
         // готовим request
         let ids: Array<string> = [bunIngredientId] // first and last ingredient Id should be buns. Order is important for sending to the server
-        // todo this is "any" as these fetched from state. Ans we did not do anything with redux store types
         ids = ids.concat(currentIngredientsUUIdsIds.flatMap((x: { ingredientId: any; }) => x.ingredientId))
         ids.push(bunIngredientId)
         // Если успех, покажем modal с order. Если успеха нет, выдаем alert с ошибкой
         dispatch(submitAnOrderActions.sendAnOrder())
         postOrder(ids).then(x => {
             dispatch(submitAnOrderActions.orderConfirmed(x))
-            dispatch(submitAnOrderActions.orderConfirmed(x))
             setSubmittedShowed(true)
-            switchSumbittedShowed()
+            switchSubmittedShowed()
         }).catch(e => {
-            console.error("can't create an order with error: ", e)
+            console.log("can't create an order with error: ", e)
             dispatch(submitAnOrderActions.orderFailed(e))
             setSubmittedShowed(false)
             alert("can't create an order. See console")
         })
     }
 
-    function switchSumbittedShowed() {
+    function switchSubmittedShowed() {
         setSubmittedShowed(!submittedShowed)
     }
 
@@ -287,8 +285,8 @@ function BurgerConstructor({
                 </Button>
             </div>
             {submittedShowed &&
-                <Modal onCloseFunction={switchSumbittedShowed} headerText={"Order confirmed!"}>
-                    <OrderDetails orderNumber={orderNumber}/>
+                <Modal onCloseFunction={switchSubmittedShowed}>
+                    <OrderConfirmedDetails orderNumber={orderNumber}/>
                 </Modal>}
         </div>
     )

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import Header from "../AppHeader/header";
@@ -16,7 +16,9 @@ import ProfileWrapper from "../Profile/profile-wrapper";
 import OrderHistory from "../Profile/order-history";
 import IngredientPage from "../IngredientPage/ingredient-page";
 import {ProtectedRouteElement} from "../ProtectedRoute/protected-route";
-import OrderLine from "../OrderLine/order-line";
+import OrderLine from "../OrderFeed/order-line";
+import OrderDetailsComponent from "../OrderDetails/order-details";
+import {createWebsocketHandler, useAppDispatch} from "../../store/reducers/FeedSlice";
 
 function App() {
     return (
@@ -36,10 +38,12 @@ function App() {
                            <Route path="/profile/someOtherProfile" element={<Tablet />} />
                        */}
                     </Route>
+                    <Route path="/profile/orders/:ordNumber" element={<ProtectedRouteElement><OrderDetailsComponent/></ProtectedRouteElement>}/>
                     <Route path="/ingredients/">
                         <Route path=":ingredientId" element={<IngredientPage />} />
                     </Route>
-                    <Route path="/ordersLine" element={<ProtectedRouteElement><OrderLine/></ProtectedRouteElement>}/>
+                    <Route path="/feed/" element={<ProtectedRouteElement><OrderLine/></ProtectedRouteElement>}/>
+                    <Route path="/feed/:ordNumber" element={<OrderDetailsComponent/>}/>
                     <Route path="/logout" element={<Login />}/>
                     <Route path="/constructor" element={<BurgerIngredientsConstructorWrapper />}/>
                     <Route path="/" element={<ProtectedRouteElement><BurgerIngredientsConstructorWrapper /></ProtectedRouteElement>}/>

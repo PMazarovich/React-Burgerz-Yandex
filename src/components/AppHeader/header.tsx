@@ -18,7 +18,7 @@ function Header() {
                 <div style={{display: 'flex', flexDirection: 'row'}}>
                     <div style={{marginLeft: '70px'}}><ListIcon type="secondary"/></div>
                     <NavLink
-                        to={`/ordersLine`}
+                        to={`/feed`}
                         style={{textDecoration: 'none'}}
                         className={nav => (nav.isActive ? `${headerStyles.marginLeft10} text text_type_main-default` : `${headerStyles.marginLeft10} text text_type_main-default text_color_inactive`)}>
                         Лента заказов

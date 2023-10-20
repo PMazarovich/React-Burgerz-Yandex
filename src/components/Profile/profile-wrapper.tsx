@@ -29,7 +29,7 @@ function ProfileWrapper() {
     }, [currentPath],)
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     return (
-        <div className={profileStyles.gridWrapper}>
+        <div className={profileStyles.profileWrapper}>
             <div className={`${profileStyles.textBoxColumns} ${profileStyles.flexedTextContainer}`}>
                 <Link to='/profile/'
                       className={`${linkStyles.default} ${profileStyles.noUnderline}`}> {/* Link меняет ссылку в адресной строке, а Router после анализа открывает соответствующие страницы */}
@@ -42,8 +42,11 @@ function ProfileWrapper() {
                     Выход
                 </div>
             </div>
+            <div className={profileStyles.flexedRightColumn}>
+                <Outlet/> {/*Outlet нарисует вместо себя в этом компоненте все компоненты по пути (они в <Route>) /profile/* См в App.js*/}
+            </div>
 
-            <Outlet/> {/*Outlet нарисует вместо себя в этом компоненте все компоненты по пути (они в <Route>) /profile/* См в App.js*/}
+
         </div>
 
     )

@@ -1,0 +1,153 @@
+.cardWrapper {
+    display: flex;
+    flex-direction: column;
+    background-color: #1c1c1c;
+    margin: 10px;
+    width: 95%;
+    height: 155px;
+    border-radius: 10px; /* Set the border radius to 10 pixels */
+}
+
+.cardHeaderWrapper {
+    margin: 5px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    align-content: center;
+    justify-content: space-between;
+    min-height: 30px;
+    background-color: transparent;
+}
+
+.cardOverviewWrapper {
+    margin-left: 5px;
+    margin-right: 5px;
+    display: flex;
+    flex-direction: row;
+    min-height: 30px;
+    background-color: transparent;
+}
+
+.cardFooterWrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: transparent;
+    margin-bottom: 5px;
+}
+
+.cardImages {
+    display: flex;
+    flex-direction: row;
+    background-color: transparent;
+    align-items: start;
+}
+
+/* Wrapper */
+.wrapper {
+    display: flex;
+    justify-content: center;
+    //border: 2px solid red;
+    padding: 10px;
+    height: 87vh;
+}
+
+/* Inner Container 1 */
+.innerContainerLeft {
+    width: 30%;
+    height: 100%;
+    //border: 2px solid red;
+    overflow: auto;
+}
+
+/* Inner Container 2 */
+.innerContainerRight {
+    margin-left: 20px;
+    width: 30%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    //border: 2px solid red;
+}
+
+/*////////*/
+.leftInnerContainerTop {
+    width: 98%; /* Adjust as needed */
+    display: flex;
+    height: 7%;
+    //border: 2px solid blue;
+}
+
+/* Inner Container 2 */
+.leftInnerContainerBottom {
+    width: 99%; /* Adjust as needed */
+    height: 90%;
+    display: flex;
+    flex-direction: column;
+    //border: 2px solid blue;
+    overflow: auto;
+}
+
+
+/*////Right styles////*/
+.rightInnerContainer {
+    width: 98%; /* Adjust as needed */
+    display: flex;
+    height: 40%;
+    margin-bottom: 40px;
+    //border: 2px solid #008dff;
+}
+
+.innerContainer11 {
+    margin-top: 55px;
+    width: 50%; /* Adjust as needed */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    height: 85%;
+    overflow: auto;
+    //border: 2px solid #7e1ea2;
+}
+
+.innerContainer22 {
+    width: 100%; /* Adjust as needed */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    height: 100%;
+    //border: 2px solid #640e0e;
+}
+
+@keyframes glow {
+    from {
+        text-shadow: 0 0 10px white, 0 0 20px white, 0 0 30px #88c7dc, 0 0 40px #3c89d0, 0 0 50px #7ecfd4, 0 0 60px #99fadc, 0 0 70px #1184e8;
+    }
+    to {
+        text-shadow: 0 0 20px white, 0 0 30px #b0e0e6, 0 0 40px #88c7dc, 0 0 50px #3c89d0, 0 0 60px #7ecfd4, 0 0 70px #99fadc, 0 0 80px #1184e8;
+    }
+}
+
+.glow {
+    color: white;
+    animation: glow 1s ease-in-out infinite alternate;
+}
+
+@keyframes glowCold {
+    from {
+        text-shadow: 0 0 10px white, 0 0 20px white, 0 0 30px #00ffff, 0 0 40px #00ffff, 0 0 50px #00ffff, 0 0 60px #00ffff, 0 0 70px #00ffff;
+    }
+    to {
+        text-shadow: 0 0 20px white, 0 0 30px #99ccff, 0 0 40px #99ccff, 0 0 50px #99ccff, 0 0 60px #99ccff, 0 0 70px #99ccff, 0 0 80px #99ccff;
+    }
+}
+
+.glowCold {
+    color: white;
+    animation: glowCold 1s ease-in-out infinite alternate;
+}
+.greenColor{
+    color: greenyellow;
+}
+.redColor{
+    color: red;
+}

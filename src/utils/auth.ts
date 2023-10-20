@@ -98,11 +98,17 @@ export function useAuth() {
         }
     }
 
+    function getAccessToken(): string | undefined{
+        return getCookie('accessToken')
+    }
+
+
     return {
         registerUser,
         getUser,
         signIn,
-        signOut
+        signOut,
+        getAccessToken,
     }
 
 }

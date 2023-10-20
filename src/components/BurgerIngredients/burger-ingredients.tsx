@@ -173,7 +173,7 @@ function BurgerIngredients({setIngredientDragging}: IBurgerIngredients) {
                     <span className={"text_type_main-default"}>{name}</span>
                 </div>
                 {detailsShowed &&
-                    <Modal onCloseFunction={switchDetailsShowed} headerText={"Ingredient details:"}>
+                    <Modal onCloseFunction={switchDetailsShowed}>
                         <IngredientDetailsModal calories={calories} name={name} imgAlt={imgAlt} imgSrc={imgSrc}
                                                 proteins={proteins} carbohydrates={carbohydrates} fat={fat}/>
                     </Modal>}

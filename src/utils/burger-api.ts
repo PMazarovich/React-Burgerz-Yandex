@@ -4,7 +4,7 @@ import {
     IIngredient,
     ILoginCredentials,
     ILogoutResponse,
-    INewRefreshTokenResponse,
+    INewRefreshTokenResponse, ISubmitAnOrderResponse,
     IUserRegistration,
     IUserResponse
 } from "./Interfaces";
@@ -38,7 +38,7 @@ async function getIngredients(): Promise<Array<IIngredient>> {
 }
 
 
-async function postOrder(order: Array<string>): Promise<number> { /* This returns order number OR throws an error */
+async function postOrder(order: Array<string>): Promise<ISubmitAnOrderResponse> {
     const response: Response = await fetch(`${NORMA_API}/orders`, {
         method: 'POST',
         headers: {
@@ -48,7 +48,7 @@ async function postOrder(order: Array<string>): Promise<number> { /* This return
         body: JSON.stringify({"ingredients": order})
     });
 
-    return await parseJsonFromResponse<number>(checkReponseStatusCode(response))
+    return await parseJsonFromResponse<ISubmitAnOrderResponse>(checkReponseStatusCode(response))
 }
 
 
