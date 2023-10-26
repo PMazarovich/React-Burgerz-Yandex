@@ -1,19 +1,13 @@
-import React, {useCallback, useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import orderLineStyles from './order-line.module.css'
 import {CurrencyIcon} from "@ya.praktikum/react-developer-burger-ui-components";
-import exp from "constants";
-import {Outlet, useLocation, useNavigate} from 'react-router-dom';
+import {Link, NavLink, useLocation, useNavigate} from 'react-router-dom';
 import classNames from "classnames";
 import {Modal} from "../Modal/modal";
-import OrderConfirmedDetails from "../OrderConfirmedDetails/order-confirmed-details";
 import OrderDetailsComponent from "../OrderDetails/order-details";
-import {IWSOptions, useSocket} from "../../utils/websockets";
-import {useAuth} from "../../utils/auth";
 import {IFeed, IIngredient, IOrderFeed} from "../../utils/Interfaces";
-import {createWebsocketHandler, feedActions, socketFeedReducers, useAppDispatch} from "../../store/reducers/FeedSlice";
-import {shallowEqual, useDispatch, useSelector} from "react-redux";
-import {RootState} from "../../store/store";
-import constructorStyles from "../BurgerConstructor/burger-constructor.module.css";
+import {createWebsocketHandler, useAppDispatch} from "../../store/reducers/FeedSlice";
+import {useAppSelector} from "../../utils/hooks";
 import {getIngredients} from "../../utils/burger-api";
 import {ingredientsActions} from "../../store/reducers/IngredientsListSlice";
 
@@ -29,10 +23,10 @@ function HeaderContainer({
     )
 }
 
-function BodyContainer({description}: { description: string }) {
+function BodyContainer({description}: { description: string | undefined}) {
     return (
         <div className={orderLineStyles.cardOverviewWrapper}>
-            <p className="text text_type_main-medium">{description}</p>
+            <p className="text text_type_main-small">{description}</p>
         </div>
     )
 }
@@ -78,44 +72,36 @@ export interface IOrderCard {
     showStatus: boolean
     description?: string
     ingredients: Array<ICardIngredient>
+    name: string | undefined
 }
 
 // todo fill with actual cardPayload
 export function OrderCard({cardPayload}: { cardPayload: IOrderCard }) {
-    const location = useLocation();
-    const [modalShowed, setModalShowed] = useState<boolean>(false)
-
     // open a portal with order details
-    function switchModalShowed(): void {
-        const newURL: URL = new URL(window.location.href);
-        newURL.pathname = `/ingredients/${cardPayload.orderNumber}`;
-        if (!modalShowed) {
-            window.history.replaceState('', '', `${location.pathname}/${cardPayload.orderNumber}`);
-        } else {
-            window.history.replaceState('', '', `${location.pathname}`);
-        }
-        setModalShowed(!modalShowed)
-    }
-
+    const location = useLocation()
     return (
-        <div className={orderLineStyles.cardWrapper} onClick={switchModalShowed}>
-            <HeaderContainer orderNumber={cardPayload.orderNumber} time={cardPayload.time}/>
-            {cardPayload.showStatus && (
-                <span className={classNames("text text_type_main-small", {
-                    // apply the green color class if status is true, otherwise apply the red color class
-                    [orderLineStyles.greenColor]: cardPayload.status,
-                    [orderLineStyles.redColor]: !cardPayload.status
-                })} style={{marginTop: "7px", marginLeft: "5px"}}>
+        /* link will place modalWasOpened in state and will triggre re-rendering an App component with all Routes */
+        <NavLink
+            style={{textDecoration: 'none', color: "#8585ad"}}
+            to={{pathname: `/feed/${cardPayload.orderNumber}`}}
+            state={{prevLocationObject: location}}
+            key={cardPayload.orderNumber}
+        >
+            <div className={orderLineStyles.cardWrapper}>
+                <HeaderContainer orderNumber={cardPayload.orderNumber} time={cardPayload.time}/>
+                {cardPayload.showStatus && (
+                    <span className={classNames("text text_type_main-small", {
+                        // apply the green color class if status is true, otherwise apply the red color class
+                        [orderLineStyles.greenColor]: cardPayload.status,
+                        [orderLineStyles.redColor]: !cardPayload.status
+                    })} style={{marginTop: "7px", marginLeft: "5px", textDecoration: 'none'}}>
                     Status is: {cardPayload.status ? "COMPLETED" : "CANCELLED"}
                 </span>
-            )}
-            <BodyContainer description={"abc"}/>
-            <FooterContainer ingredients={cardPayload.ingredients}/>
-            {modalShowed &&
-                <Modal onCloseFunction={switchModalShowed}>
-                    <OrderDetailsComponent/>
-                </Modal>}
-        </div>
+                )}
+                <BodyContainer description={cardPayload.name}/>
+                <FooterContainer ingredients={cardPayload.ingredients}/>
+            </div>
+        </NavLink>
     )
 }
 
@@ -156,7 +142,8 @@ export function createOrderCardsFromFeed(feed: IFeed, genericIngredients: Array<
             orderNumber: order.number,
             time: new Date(order.updatedAt),
             status: parseStatus(order.status),
-            ingredients: cardIngredients
+            ingredients: cardIngredients,
+            name: order.name
         }
         result.push(ordCard)
 
@@ -167,36 +154,56 @@ export function createOrderCardsFromFeed(feed: IFeed, genericIngredients: Array<
 
 function OrderFeed() {
     const dispatch = useAppDispatch();
+
     const {
         total,
         totalToday,
         feed,
-        genericIngredients,
-    } = useSelector((store: RootState) => ({
+        ingredients,
+        socketConnected,
+    } = useAppSelector((store) => ({
         total: store.socketFeed.feedState.total,
         totalToday: store.socketFeed.feedState.totalToday,
         feed: store.socketFeed.feedState,
-        genericIngredients: store.ingredientsState.ingredients
+        ingredients: store.ingredientsState.ingredients,
+        socketConnected: store.socketFeed.socketState.status
     }))
 
-    // let's open a socket connection right away
-    // Use the custom typed useDispatch hook instead of the default one
 
-    // Use useEffect to dispatch the thunk when the component mounts
+    let orderCards: IOrderCard[] = []
+    let [pendingCompleted, setPendingCompleted] = useState<[number[], number[]]>([[], []])
+
+    if ((feed.orders.length > 0) && (ingredients.length > 0)){
+       orderCards = createOrderCardsFromFeed(feed, ingredients)
+    }
+
     useEffect(() => {
         // Dispatch the thunk with the websocket url as an argument
         // This thunk will create a websocket connection and will store data in redux
-        dispatch(createWebsocketHandler("wss://norma.nomoreparties.space/orders/all"))
-    }, [dispatch]);
+        // Если сокет не подключен, подключить его
+        if (socketConnected !== 'connected') {
+            dispatch(createWebsocketHandler("wss://norma.nomoreparties.space/orders/all"))
+        }
+        // Если ингредиентов нет - потащим их
+        if(ingredients.length === 0) {
+            getIngredients().then((ingredients: Array<IIngredient>) => {
+                dispatch(ingredientsActions.ingredientsFetchingSuccess(ingredients))
+            }).catch((err) => {
+                dispatch(ingredientsActions.ingredientsFetchingFailure(err))
+            })
+        }
+        if(feed.orders.length > 0) {
+            setPendingCompleted(formPendingAndCompleted(feed))
+        }
+    }, [dispatch, feed, ingredients.length, socketConnected]);
 
-    let orders = createOrderCardsFromFeed(feed, genericIngredients)
-    let [pending, completed] = formPendingAndCompleted(feed)
+
     return (
         <div className={orderLineStyles.wrapper}>
             <div className={orderLineStyles.innerContainerLeft}>
                 <p className={`${orderLineStyles.leftInnerContainerTop} text text_type_main-large`}>Order line</p>
                 <div className={`${orderLineStyles.leftInnerContainerBottom} custom-scroll`}>
-                    {orders.map((order, index) => {
+                    { orderCards.length !== 0 && orderCards.map((order, index) => {
                         return <OrderCard key={index} cardPayload={order}/>
                     })}
                 </div>
@@ -212,8 +219,7 @@ function OrderFeed() {
                             marginLeft: "10px",
 
                         }}>
-                            {/* todo generate this below component here */}
-                            {completed.map((ordnumber, key) => {
+                            {pendingCompleted[1].map((ordnumber, key) => {
                                 return <span key={key} className={'text text_type_digits-default'}
                                              style={{color: "#abff4fd6"}}>{ordnumber}</span>
                             })}
@@ -229,7 +235,7 @@ function OrderFeed() {
                             marginLeft: "10px",
                             marginBottom: "20px"
                         }}>
-                            {pending.map((ordnumber, key) => {
+                            {pendingCompleted[0].map((ordnumber, key) => {
                                 return <span key={key} className={'text text_type_digits-default'}>{ordnumber}</span>
                             })}
                         </div>
@@ -250,7 +256,6 @@ function OrderFeed() {
             </div>
         </div>
     )
-        ;
 }
 
 

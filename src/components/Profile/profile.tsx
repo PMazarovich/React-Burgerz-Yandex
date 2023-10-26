@@ -1,17 +1,17 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import profileStyles from './profile.module.css';
 import {Button, Input} from "@ya.praktikum/react-developer-burger-ui-components";
-import {useDispatch, useSelector} from "react-redux";
 import {updateUser} from "../../utils/burger-api";
 import {authActions} from "../../store/reducers/AuthSlice";
 import {TICons} from "@ya.praktikum/react-developer-burger-ui-components/dist/ui/icons";
+import {useAppDispatch, useAppSelector} from "../../utils/hooks";
 
 function Profile() {
-    const {namee, emaill} = useSelector((state: any) => ({
+    const {namee, emaill} = useAppSelector((state) => ({
         namee: state.authState.name,
         emaill: state.authState.email
     }));
-    const dispatch = useDispatch()
+    const dispatch = useAppDispatch()
     const [showCommitButtons, setShowCommitButtons] = React.useState<boolean>(false)
     const [name, setName] = React.useState(namee)
     const [password, setPassword] = React.useState<string>('')

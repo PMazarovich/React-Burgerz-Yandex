@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
-import {useDispatch} from "react-redux";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
-import {getIngredients, logout} from "../../utils/burger-api";
+import {getIngredients} from "../../utils/burger-api";
 import ingredientPageStyles from './ingredient-page.module.css'
 import {IIngredient} from "../../utils/Interfaces";
+import {useAppDispatch} from "../../utils/hooks";
 
 function TextDetailsContainer({name, value}: {name: string, value: string | number}) {
     return (
@@ -16,24 +16,24 @@ function TextDetailsContainer({name, value}: {name: string, value: string | numb
 
 
 function IngredientPage() {
+    // ingredient page will anyway fetch data from backend and render an exact ingredient by the id. This is not optimal.
+    // better check if there is already ingredients in store and if they are, get data from there. If not - fetch from backend.
     const { ingredientId } = useParams(); // Access the ingredientId parameter from the URL
-    const navigate = useNavigate()
     const [ingredient, setIngredient] = useState<IIngredient | null>(null)
     const [fetching, setFetching] = useState<boolean>(true)
-    const dispatch = useDispatch()
     // check if the model was opened. If it was, redirect to '/'
-    useEffect(() => {
+    /*useEffect(() => {
         const ingredientId: string | null = localStorage.getItem('portalOpen');
         if (ingredientId != null) {
             navigate('/')
         }
-    }, [])
+    }, [])*/
     React.useEffect(() => {
         setFetching(true)
         getIngredients().then((ingredients: Array<IIngredient>) => {
             // console.log(ingredients)
             // const temp = ingredients.filter(x => x._id === ingredientId)[0]
-            console.log(ingredients.filter(x => x._id === ingredientId)[0])
+            //console.log(ingredients.filter(x => x._id === ingredientId)[0])
             setIngredient(ingredients.filter(x => x._id === ingredientId)[0])
             setFetching(false)
         }).catch((err) => {

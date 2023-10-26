@@ -5,9 +5,10 @@ import counterImage from '../../images/counterIcon.png'
 import IngredientDetailsModal from "../IngredientDetailsModal/ingredient-details-modal";
 import {useDispatch, useSelector} from "react-redux";
 import {useDrag} from "react-dnd";
-import {useNavigate} from "react-router-dom";
+import {Link, useLocation, useNavigate} from "react-router-dom";
 import {IBurgerIngredients, IFoodContainer, IIngredient} from "../../utils/Interfaces";
 import {Modal} from "../Modal/modal";
+import {useAppDispatch, useAppSelector} from "../../utils/hooks";
 
 
 function BurgerIngredients({setIngredientDragging}: IBurgerIngredients) {
@@ -39,7 +40,7 @@ function BurgerIngredients({setIngredientDragging}: IBurgerIngredients) {
     }
 
     //const burgerConstructorState = useContext(CommonDataFromServerContext); // тащим burgerConstructorState из контекста
-    const {ingredients, currentIngredientsIds} = useSelector((store: any) => ({
+    const {ingredients, currentIngredientsIds} = useAppSelector((store) => ({
         ingredients: store.ingredientsState.ingredients,
         currentIngredientsIds: store.constructorState.ingredients
     }))
@@ -78,7 +79,7 @@ function BurgerIngredients({setIngredientDragging}: IBurgerIngredients) {
         );
     });
 
-    function FoodCounter({ ingredientId }: { ingredientId: string }) { /* this component should be placed inside relative component!*/
+    function FoodCounter({ingredientId}: { ingredientId: string }) { /* this component should be placed inside relative component!*/
         // соберем все совпадения из constructor для данного элемента
         let count: number = currentIngredientsIds.filter((currentIngredientsId: { uuid: string; ingredientId: string; }) => currentIngredientsId.ingredientId === ingredientId).length
         return (
@@ -98,10 +99,21 @@ function BurgerIngredients({setIngredientDragging}: IBurgerIngredients) {
 
     /*картинка + описание + счетчик + вызов портала с описанием на левый клик*/
 
-    // Этот компонент перетаскиваемый
-    function FoodContainer({ingredientId, imgSrc, imgAlt, name, price, proteins, fat, carbohydrates, calories}: IFoodContainer) {
-        const dispatch = useDispatch();
+    // Этот компонент перетаскиваемый и кликабельный. Каждый завернут в Link
+    function FoodContainer({
+                               ingredientId,
+                               imgSrc,
+                               imgAlt,
+                               name,
+                               price,
+                               proteins,
+                               fat,
+                               carbohydrates,
+                               calories
+                           }: IFoodContainer) {
+        const dispatch = useAppDispatch();
         const navigate = useNavigate()
+        const location = useLocation();
         // ВНИМАНИЕ! ВСЕГДА ПЕРЕДАВАТЬ В ПРИЕМНИК ПО DND ПО ВОЗМОЖНОСТИ ТОЛЬКО ID! ИНАЧЕ ПОВЫШАЕТСЯ СВЯЗАННОСТЬ КОМПОНЕНТОВ
         const [{isDrag}, dragRef] = useDrag({   //<- он возвращает {тут всякие возвращаемые объекты типа monitor.isDragging() и т.д.} и ref компонента, на который повешен этот хук
             type: "abstractIngredient",
@@ -122,62 +134,33 @@ function BurgerIngredients({setIngredientDragging}: IBurgerIngredients) {
             }
         }, [isDrag]);
 
-        const [detailsShowed, setDetailsShowed] = React.useState<boolean>(false)
-        useEffect(() => {
-            const ingredientIdd = localStorage.getItem('portalOpen');
-            if (ingredientIdd != null && ingredientIdd === ingredientId) {
-                switchDetailsShowed(ingredientIdd)
-            } else {
-                setDetailsShowed(false)
-            }
-        }, [])
-
-        function switchDetailsShowed(ingredientId?: string) {
-            console.log("ingredientId IS ", ingredientId)
-            const currentState = window.history.state; // Get the current state
-            console.log(currentState)
-            const newURL: URL = new URL(window.location.href);
-            newURL.pathname = `/ingredients/${ingredientId}`;
-
-            if (!detailsShowed) {
-                setDetailsShowed(true)
-                window.history.pushState(currentState, '', newURL);
-                if (typeof ingredientId === "string") {
-                    localStorage.setItem('portalOpen', ingredientId);
-                }
-            } else {
-                setDetailsShowed(false)
-                navigate('/')
-                localStorage.removeItem('portalOpen');
-            }
-
-        }
 
         return (
-            <>
-                <div ref={dragRef}          // Реф из useDrag
-                     onClick={() => {
-                         switchDetailsShowed(ingredientId)
-                     }} className={burgerIngredientsStyles.foodContainerParent}>
+            <div ref={dragRef}          // Реф из useDrag
+                 className={burgerIngredientsStyles.foodContainerParent}>
+                {/* после того как произошел редирект через link, Router начинает заново поиск и отрисовку необходимого компонента в App. */}
+                <Link
+                    to={{pathname: `/ingredients/${ingredientId}`}}
+                    state={{prevLocationObject: location}}
+                    key={ingredientId}
+                >
+
                     <div
                         className={burgerIngredientsStyles.relative}>{/*parent should be relative so child can be absolute relatively to parent */}
                         {/*In this div we will place the main image AND a counter image with counter inside*/}
                         <img className={'p-3'} src={imgSrc} alt={imgAlt}/> {/*main image*/}
                         <FoodCounter ingredientId={ingredientId}/>
                     </div>
-                    <div className={burgerIngredientsStyles.flexCenter}>
+                </Link>
+                <div className={burgerIngredientsStyles.flexCenter}>
                         <span
                             className={`${burgerIngredientsStyles.marginRight10} text_type_main-default`}>{price}</span>
-                        <CurrencyIcon type="primary"/>
-                    </div>
-                    <span className={"text_type_main-default"}>{name}</span>
+                    <CurrencyIcon type="primary"/>
                 </div>
-                {detailsShowed &&
-                    <Modal onCloseFunction={switchDetailsShowed}>
-                        <IngredientDetailsModal calories={calories} name={name} imgAlt={imgAlt} imgSrc={imgSrc}
-                                                proteins={proteins} carbohydrates={carbohydrates} fat={fat}/>
-                    </Modal>}
-            </>
+
+                <span className={"text_type_main-default"}>{name}</span>
+            </div>
+
         );
     }
 

@@ -1,14 +1,15 @@
 import orderDetailsStyles from './order-details.module.css'
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {CurrencyIcon} from "@ya.praktikum/react-developer-burger-ui-components";
-import {ICardIngredient, IOrderCard} from "../OrderFeed/order-line";
-import {useParams} from "react-router-dom";
-import {useSelector} from "react-redux";
-import {RootState} from "../../store/store";
+import {ICardIngredient} from "../OrderFeed/order-line";
+
 import {IIngredient, IOrderFeed} from "../../utils/Interfaces";
 import {createWebsocketHandler, useAppDispatch} from "../../store/reducers/FeedSlice";
+import {useAppSelector} from "../../utils/hooks";
+import {useParams} from "react-router-dom";
 import {getIngredients} from "../../utils/burger-api";
 import {ingredientsActions} from "../../store/reducers/IngredientsListSlice";
+
 
 export function IngredientContainer({
                                         ingredient,
@@ -52,7 +53,7 @@ interface ICardIngredientWithNameAndDescription extends ICardIngredient {
     description: string;
 }
 
-function calculateRepetitionsForIngredients(cardIngredients: Array<ICardIngredientWithNameAndDescription>): { [key: string]: { count: number, object: ICardIngredientWithNameAndDescription } } {
+function calculateRepetitionsForIngredients(cardIngredients: Array<ICardIngredientWithNameAndDescription>): TIngredientCount {
     let result: { [key: string]: { count: number, object: ICardIngredientWithNameAndDescription } } = {};
     cardIngredients.forEach(ingredient => {
         if (!result[ingredient.name]) {
@@ -65,7 +66,6 @@ function calculateRepetitionsForIngredients(cardIngredients: Array<ICardIngredie
 
 
 function extractIngredients(genericIngredients: Array<IIngredient>, order: IOrderFeed): Array<ICardIngredientWithNameAndDescription> {
-
     let cardIngredients: Array<ICardIngredientWithNameAndDescription> = []
     order.ingredients.forEach((x: string) => {
         const ingredientFiltered: IIngredient = genericIngredients.filter((ing: IIngredient) => ing._id === x)[0]
@@ -81,118 +81,99 @@ function extractIngredients(genericIngredients: Array<IIngredient>, order: IOrde
     return cardIngredients
 }
 
-type IngredientCount = { [p: string]: { count: number, object: ICardIngredientWithNameAndDescription } };
+type TIngredientCount = { [p: string]: { count: number, object: ICardIngredientWithNameAndDescription } };
 
-/// this is actually a portal. This portal will fetch the data from redux based on orderNumber in URL
+// Этот компонент описывает детали заказа
 function OrderDetailsComponent() {
-    console.log("here we are")
+    console.log("we are in OrderDetailsComponent")
     const dispatch = useAppDispatch()
-    // const { ordNumber } = useParams(); // Access the ordNumber parameter from the URL. USE THIS VARIANT! IF THERE IS NO POPUP PORTALS WITH ADDED :id
-    // console.log(window.location.href)
-    // Convert the last segment to a number using the Number() function
-    const ordNumber: number = Number(window.location.href.split("/").pop())
-    const {order, genericIngredients, socketStatus} = useSelector((store: RootState) => {
+    const {ordNumber} = useParams();
+    const ordNumberr: number = Number(ordNumber);
+    const [ingredientToCount, setIngredientToCount] = useState<TIngredientCount | null>(null)
+    const [sum, setSum] = useState<number>(0)
+    const [status, setStatus] = useState<boolean>(false)
+    // Пробуем достать из хранилища заказ и ингредиенты
+    const { order , ingredients}  = useAppSelector((store) => {
         return {
-            order: store.socketFeed.feedState.orders.filter(order => order.number === ordNumber)[0],
-            genericIngredients: store.ingredientsState.ingredients,
-            socketStatus: store.socketFeed.socketState.status
+            order: store.socketFeed.feedState.orders.filter(order => order.number === ordNumberr)[0],
+            ingredients: store.ingredientsState.ingredients
         }
     })
-    // todo не работает вариант, когда сразу заходим в http://localhost:3000/feed/23910
-    // todo было бы логично сделать get запроса какого-то конкретного ингредиента, если в reudx нет записей о feed.
-    // todo иначе получается, что чтобы достать информацию о конкретном заказе нужно открывать webSocket и фильтровать там всё.
-    let ingredientToCount = calculateRepetitionsForIngredients(extractIngredients(genericIngredients, order))
-    let orderSum = genericIngredients.reduce((sum, ingredient) => sum + ingredient.price, 0)
-    let status: boolean = order.status === "done"
-    // create useState for each variable
-   /* let [ingredients, setIngredients] = useState<ICardIngredientWithNameAndDescription[]>(extractIngredients(genericIngredients, order));
-    let [ingredientToCount, setIngredientToCount] = useState<IngredientCount>({});
-    let [status, setStatus] = useState(false);
-    let [orderSum, setOrderSum] = useState(0);
-*/
-    // todo здесь пытался сделать логику по вытаскиванию из websocket, если нет в redux. В результате лиюбо бесконечный ререндер, либо вообще всё ломается.
-    /*useEffect(() => {
-        if(genericIngredients.length === 0) {
-            console.log("WE ARE IN USEEFFECT");
-            if (genericIngredients.length === 0) {
-                getIngredients()
-                    .then((ingredients: Array<IIngredient>) => {
-                        setIngredients(extractIngredients(ingredients, order));
-                        setStatus(order.status === "done");
-                        setIngredientToCount(calculateRepetitionsForIngredients(extractIngredients(genericIngredients, order)));
-                        setOrderSum(ingredients.reduce((sum, ingredient) => sum + ingredient.price, 0));
-                    })
-            }
-            if (socketStatus !== "connected") {
-                dispatch(createWebsocketHandler("wss://norma.nomoreparties.space/orders/all"));
-            }
-            if (genericIngredients.length !== 0) {
-                console.log("HOHOHO");
-                console.log(genericIngredients);
-                // use setIngredients to update the ingredients state
-                setIngredients(extractIngredients(genericIngredients, order));
-                // use setIngredientToCount to update the ingredientToCount state
-                // use setStatus to update the status state
-                setStatus(order.status === "done");
-                // use setOrderSum to update the orderSum state
-                if (ingredients) {
-                    setIngredientToCount(calculateRepetitionsForIngredients(ingredients));
-                    setOrderSum(ingredients.reduce((sum, ingredient) => sum + ingredient.price, 0));
+    // console.log('order', order)
+    // todo почему я должен писать отдельный useeffect на order и ingredietns, если useSelector должен всё рисовать заново?
+    if (order && ingredients.length !== 0 && sum === 0 && !ingredientToCount) {
+        console.log('order', order)
+        console.log('ingredients', ingredients)
+        setIngredientToCount(calculateRepetitionsForIngredients(extractIngredients(ingredients, order)))
+        setSum(extractIngredients(ingredients, order).reduce((sum, ingredient) => sum + ingredient.price, 0))
+    }
+    // Это не раотает. Почему?
+    useEffect(() => {
+        // Если ингредиентов нет, запрашиваем новые
+        if(ingredients.length === 0)
+            getIngredients().then((ingredients: Array<IIngredient>) => {
+                dispatch(ingredientsActions.ingredientsFetchingSuccess(ingredients))
+                // Если нет заказа, открываем сокет и вытаскиваем оттуда заказы
+                if(!order){
+                    // Dispatch the thunk with the websocket url as an argument
+                    // This thunk will create a websocket instance in redux store and will handle different events accordingly
+                    dispatch(createWebsocketHandler("wss://norma.nomoreparties.space/orders/all"))
                 }
-
-            }
-        }
-    }, []);*/
-
-
+            }).catch((err) => {
+                dispatch(ingredientsActions.ingredientsFetchingFailure(err))
+                console.log("ERROR DURING INGREDIENTS FETCH")
+                console.log(err)
+            })
+    }, []);
 
     return (
         <div className={orderDetailsStyles.wrapper}>
-            <div className={orderDetailsStyles.header}>
+            {order &&
+                <div className={orderDetailsStyles.header}>
                 <span
                     className={"text text_type_digits-default"}>{ordNumber}</span> {/* Use a variable or prop for the order number */}
-                <div className={orderDetailsStyles.description}>
-                    {order &&
+                    <div className={orderDetailsStyles.description}>
                         <span
                             className={"text text_type_main-medium"}>{order.name}</span>
-                    }{/* Use a variable or prop for the order description */}
-                    {status ? (
-                        <span
-                            className={"text text_type_main-small"}
-                            style={{color: "#89ffca", marginTop: "7px"}}
-                        >
+                        {/* Use a variable or prop for the order description */}
+                        {status ? (
+                            <span
+                                className={"text text_type_main-small"}
+                                style={{color: "#89ffca", marginTop: "7px"}}
+                            >
             Status is: COMPLETED
           </span>
-                    ) : (
-                        <span
-                            className={"text text_type_main-small"}
-                            style={{color: "#ff0000", marginTop: "7px"}}
-                        >
+                        ) : (
+                            <span
+                                className={"text text_type_main-small"}
+                                style={{color: "#ff0000", marginTop: "7px"}}
+                            >
             Status is: Cancelled
           </span>
-                    )}
-                </div>
-                <div className={orderDetailsStyles.ingredientContainerWithHeaderWrapper}>
-                    <span className={"text text_type_main-medium"}>Состав: </span>
-                    <div className={`${orderDetailsStyles.ingredientContainerWrapper} custom-scroll`}>
-                        {ingredientToCount && Object.entries(ingredientToCount).map(([_, value], index) => (
-                            <IngredientContainer key={index} ingredient={value.object}
-                                                 numberOfRepetitions={value.count}/>)
                         )}
                     </div>
-                    <div className={orderDetailsStyles.footerContainer}>
-                        {order &&
+                    <div className={orderDetailsStyles.ingredientContainerWithHeaderWrapper}>
+                        <span className={"text text_type_main-medium"}>Состав: </span>
+                        <div className={`${orderDetailsStyles.ingredientContainerWrapper} custom-scroll`}>
+                            {ingredientToCount && Object.entries(ingredientToCount).map(([_, value], index) => (
+                                <IngredientContainer key={index} ingredient={value.object}
+                                                     numberOfRepetitions={value.count}/>)
+                            )}
+                        </div>
+                        <div className={orderDetailsStyles.footerContainer}>
+                            {order &&
+                                <span
+                                    className={"text text_type_main-medium"}>{order.createdAt}</span>
+                            }{/* Use a variable or prop for the order description */}
+                            <div style={{display: "flex", marginRight: "15px"}}>
                             <span
-                                className={"text text_type_main-medium"}>{order.createdAt}</span>
-                        }{/* Use a variable or prop for the order description */}
-                        <div style={{display: "flex", marginRight: "15px"}}>
-                            <span
-                                style={{marginRight: "15px"}}>{orderSum}</span> {/* Use a variable or prop for the order sum */}
-                            <CurrencyIcon type="primary"/>
+                                style={{marginRight: "15px"}}>{sum}</span> {/* Use a variable or prop for the order sum */}
+                                <CurrencyIcon type="primary"/>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            }
         </div>
     );
 }

@@ -9,8 +9,8 @@ import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 // Токен же будет находиться в постоянной памяти браузера
 
 interface IInitialState {
-    name: string | null;
-    email: string | null;
+    name: string;
+    email: string;
     permissions: any; // there is no permissions currently, so now it is any
     userLoggedIn: boolean
 }
@@ -23,8 +23,8 @@ interface IUserLoggedInActionType {
 }
 
 const initialState: IInitialState = {
-    name: null,
-    email: null,
+    name: '',
+    email: '',
     permissions: null,
     userLoggedIn: false,
 }
@@ -35,8 +35,8 @@ export const authSlice = createSlice(
         initialState: initialState,
         reducers: {
             userLoggedOut(state) {
-                state.name = null
-                state.email = null
+                state.name = ''
+                state.email = ''
                 state.permissions = null
                 state.userLoggedIn = false
             },

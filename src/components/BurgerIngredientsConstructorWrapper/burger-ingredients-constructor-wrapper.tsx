@@ -2,20 +2,20 @@ import React, {useState} from 'react';
 import BurgerIngredients from "../BurgerIngredients/burger-ingredients";
 import BurgerConstructor from "../BurgerConstructor/burger-constructor";
 import bcwStyles from './burger-ingredients-constructor-wrapper.module.css'
-import {useDispatch, useSelector} from "react-redux";
 import {DndProvider} from "react-dnd";
 import {HTML5Backend} from "react-dnd-html5-backend";
 import {ingredientsActions} from "../../store/reducers/IngredientsListSlice";
 import {getIngredients} from "../../utils/burger-api";
 import {IIngredient} from "../../utils/Interfaces";
+import {useAppDispatch, useAppSelector} from "../../utils/hooks";
 
 function BurgerIngredientsConstructorWrapper() { /* this component just adds a pretty message if there is no data from server */
-    const { ingredients } = useSelector((state: any) => ({
+    const { ingredients } = useAppSelector((state) => ({
         ingredients: state.ingredientsState.ingredients,
     }));
     const [fetching, setFetching] = useState<boolean>(true)
     const [error, setError] = useState<boolean>(false)
-    const dispatch = useDispatch()
+    const dispatch = useAppDispatch()
     /* Тащим данные с сервера 1 единственный раз*/
     React.useEffect(() => {
         getIngredients().then((ingredients: Array<IIngredient>) => {

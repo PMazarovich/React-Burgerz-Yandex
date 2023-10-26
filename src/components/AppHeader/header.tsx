@@ -1,7 +1,7 @@
 import React from 'react';
 import {BurgerIcon, ListIcon, Logo, ProfileIcon} from '@ya.praktikum/react-developer-burger-ui-components'
 import headerStyles from './header.module.css'
-import {NavLink} from "react-router-dom";
+import {Link, NavLink} from "react-router-dom";
 
 function Header() {
     return (
@@ -26,7 +26,12 @@ function Header() {
                 </div>
             </div>
             <div className={headerStyles.logo}>
+                <Link
+                    to={`/`}
+                    style={{textDecoration: 'none'}}>
                 <Logo/>
+                </Link>
+
             </div>
             <div className={headerStyles.flexRowCenter}>
                 <div className={headerStyles.flexRowCenter}>

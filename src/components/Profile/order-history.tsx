@@ -3,8 +3,7 @@ import orderHistoryStyles from "./order-history.module.css"
 import {createOrderCardsFromFeed, IOrderCard, OrderCard} from "../OrderFeed/order-line";
 import classNames from "classnames";
 import {createWebsocketHandler, useAppDispatch} from "../../store/reducers/FeedSlice";
-import {useSelector} from "react-redux";
-import {RootState} from "../../store/store";
+import {useAppSelector} from "../../utils/hooks";
 
 function OrderHistory() {
     // todo fetch orders for this exact user
@@ -12,7 +11,7 @@ function OrderHistory() {
     const {
         feed,
         genericIngredients,
-    } = useSelector((store: RootState) => ({
+    } = useAppSelector((store) => ({
         total: store.socketFeed.feedState.total,
         totalToday: store.socketFeed.feedState.totalToday,
         feed: store.socketFeed.feedState,

@@ -7,6 +7,10 @@ https://www.flaticon.com/ - ИКОНКИ
 https://medium.com/@mautayro/understanding-css-position-display-float-87f9727334b2 - POSITION DISPLAY ETC
 https://cssloaders.github.io/ - spinner
 https://habr.com/ru/companies/tinkoff/articles/588655/ - дженерики
+https://v5.reactrouter.com/web/example/modal-gallery - документация по роутеру
+https://www.joshwcomeau.com/react/usememo-and-usecallback/ - хорошая документация по useMemo и useCallback
+https://www.joshwcomeau.com/react/why-react-re-renders/ - ререндеры
+
 
 DEBUG - run Debug and then ctrl+shift and go to Local:  http://localhost:3000   in Process console
 
@@ -94,3 +98,6 @@ export function ProtectedRouteElement({ children }) {
 }
 ////////////////////////////////////////
 //////////////TODO ПЕРЕДЕЛАТЬ ВСЕ ЗАПРОСЫ, КОТОРЫЕ ИДУТ В STORE ЧЕРЕЗ REDUX THUNK!!!! ПРИМЕР В ORDER-LINE
+в useEffect никаких setState! стараться проверять все условия вне useEffect, пример src/components/OrderFeed/order-line.tsx:176
+Необходимо закрывать соединения при выходе из компонентов!
+ctrl+p - быстрый поиск файла в отладчике google chrome. Лучше использовать отладчик google chrome нежели идеевский

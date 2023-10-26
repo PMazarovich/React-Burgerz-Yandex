@@ -1,8 +1,8 @@
 import {getNewAccessToken, getUserRequest, loginRequest, logout, registerRequest} from "./burger-api";
 import {authActions} from "../store/reducers/AuthSlice";
-import {useDispatch} from "react-redux";
 import {deleteCookie, extractBearerToken, getCookie, setCookie} from "./utils";
 import {IAuthResponse, ILoginCredentials, IUserRegistration} from "./Interfaces";
+import {useAppDispatch} from "./hooks";
 
 // login ReactBurgerzUzer
 // email HeNZPQZyofer8K63YovU1BsKl8fGqCkd@test.com
@@ -13,7 +13,7 @@ import {IAuthResponse, ILoginCredentials, IUserRegistration} from "./Interfaces"
 // Напишем хук, который будет заниматься аутентификацией
 
 export function useAuth() {
-    const dispatch = useDispatch()
+    const dispatch = useAppDispatch()
 
     function saveAuthInfo(type: string, message: IAuthResponse) {
         if (message.success) {
