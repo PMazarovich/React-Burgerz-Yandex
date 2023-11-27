@@ -9,6 +9,15 @@
     flex-direction: column;
     align-items: center;
 }
+.text_type_main-medium.text_color_inactive.flex-display {
+    display: flex;
+}
+.loaderStyle{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
 .bottomTextConteiner{
     display: flex;
     flex-direction: row;
@@ -18,7 +27,6 @@
 }
 .relative{
     position: relative;
-    margin-top: 150px;
 }
 .width500height250{
     width: 500px;

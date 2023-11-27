@@ -1,8 +1,9 @@
-.gridWrapper {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    margin-top: 150px;
-    min-height: 200px;
+.profileWrapper {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: center;
+    //background-color: lightblue;
 }
 
 .textBoxColumns {
@@ -31,14 +32,24 @@
     flex-direction: column;
     align-content: center;
     align-items: center;
+    margin-top: 5%;
+    //margin-left: 20%;
 }
 
 .flexedTextContainer{
+    margin-top: 100px;
     display: flex; /* or inline-flex */
     flex-direction: column;
+    flex: 1 0 0;
     align-content: center;
     align-items: center;
     row-gap: 10px;
+}
+
+
+.flexedRightColumn{
+    display: flex; /* or inline-flex */
+    flex: 2 0 0;
 }
 
 .marginTop20px{
@@ -50,4 +61,9 @@
 
 .noUnderline {
     text-decoration: none;
+}
+
+.exitButton{
+    background-color: transparent;
+    cursor: pointer;
 }

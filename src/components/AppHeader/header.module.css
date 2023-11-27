@@ -45,8 +45,9 @@
     justify-content: left;
 }
 
-.marginLeft10 {
+.marginLeft10TextDecorationNone {
     margin-left: 10px;
+    text-decoration: none;
 }
 
 .activatedLink{
@@ -56,8 +57,13 @@
     color: aqua;
 }
 
+.marginLeft70{
+    margin-left: 70px;
+}
 
-/*
+.textDecorationNone{
+    text-decoration: none;
+}/*
  ЭТО СТАРЫЙ ВАРИАНТ БЕЗ FLEXBOX
 .logo {
     !* Это размеры картинки. Они принимаются во внимание, когда калькулируется center в parent компоненте*!

@@ -1,4 +1,4 @@
-import React, {SyntheticEvent, useEffect, useState} from 'react';
+import React, {FormEvent, SyntheticEvent, useEffect, useState} from 'react';
 import loginStyles from './login.module.css'
 import {Button, Input} from "@ya.praktikum/react-developer-burger-ui-components";
 import {useAuth} from "../../utils/auth";
@@ -19,7 +19,7 @@ function Login() {
         password: '',
     });
 
-    async function signIn(e: SyntheticEvent): Promise<void> {
+    async function signIn(e: FormEvent<HTMLFormElement>): Promise<void> {
         try {
             e.preventDefault();
             await auth.signIn(credentials);
