@@ -134,7 +134,8 @@ function BurgerIngredients({setIngredientDragging}: IBurgerIngredients) {
 
 
         return (
-            <div ref={dragRef}          // Реф из useDrag
+            <div id={name.replace(/\s/g, "_")} // this is for tests selectors, id will be Биокотлета_из_марсианской_Магнолии
+                 ref={dragRef}          // Реф из useDrag
                  className={burgerIngredientsStyles.foodContainerParent}>
                 {/* после того как произошел редирект через link, Router начинает заново поиск и отрисовку необходимого компонента в App. */}
                 <Link

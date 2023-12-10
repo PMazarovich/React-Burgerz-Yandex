@@ -105,3 +105,8 @@ ctrl+p - быстрый поиск файла в отладчике google chrom
 /////////////
 Использовать хуки - очень удобный инструмент для разнообразных аргументов одного и того же действия. Пример - useAuth и useSocket
 // Попапы - см видеозапись урока. Пример в App и дочерних компонентах
+//////////////////
+Cypress  - удобно использовать https://chromewebstore.google.com/detail/cypress-chrome-recorder/fellcphjglholofndfmmjmheedhomgin
+Можно делать экспорт сразу в тест
+npm run cypress:open - эти команды см. в package.json
+build, deploy и настройка nginx см в курсе яндекса

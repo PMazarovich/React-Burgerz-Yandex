@@ -19,7 +19,7 @@ interface IsocketFeed {
 }
 
 
-const initialState: IsocketFeed = {
+export const initialState: IsocketFeed = {
     feedState: {
         success: false,
         orders: [],
@@ -61,35 +61,6 @@ export const feedSlice = createSlice(
         }
     })
 
-/*export const createWebsocketHandler = createAsyncThunk(
-    "websocket/feed",
-    //payloadCreator takes two arguments: the first one is the argument that you pass to the thunk action creator when you dispatch it,
-    // and the second one is an object with some useful properties and methods, such as getState, dispatch, rejectWithValue, etc.
-    // аргумент            // thunkAPI имеет getState и dispatch
-    async (url: string, thunkAPI) => {
-        const websocket = new WebSocket(url);
-        websocket.addEventListener("open", () => {
-            thunkAPI.dispatch(feedActions.connectionOpened())
-        })
-        websocket.addEventListener("message", (event: MessageEvent<any>) => {
-            // Dispatch an action when a message is received
-            thunkAPI.dispatch(feedActions.messageReceived(JSON.parse(event.data)));
-        });
-        // Use the ErrorEvent interface for the error event
-        websocket.addEventListener("error", (event: Event) => {
-            // Dispatch an action when an error occurs
-            thunkAPI.dispatch(feedActions.connectionError(event));
-        });
-        websocket.addEventListener("close", () => {
-            // Dispatch an action when the connection is closed
-            thunkAPI.dispatch(feedActions.connectionClosed());
-        });
-
-        // Можно вернуть инстанс созданного вебсокета. Но нам не нужно
-        // return websocket
-
-    }
-)*/
 export const socketFeedReducers = feedSlice.reducer
 export const feedActions = feedSlice.actions
 

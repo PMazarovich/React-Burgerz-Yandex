@@ -3,13 +3,12 @@
 * This Slice is responsible for burger constructor operations (add/remove ingredient as example)
 *
 * */
-import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {ISubmitAnOrderResponse} from "../../utils/Interfaces";
-import {feedActions} from "./FeedSlice";
+import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {postOrder} from "../../utils/burger-api";
+import {getIngredients} from "./IngredientsListSlice";
 
 interface ISubmitAnOrderState {
-    orderNumber: number ;
+    orderNumber: number;
     fetching: boolean;
     error: string
     name: string
@@ -27,46 +26,49 @@ export const submitAnOrderSlice = createSlice(
         name: 'submit/order',             //ключ, который станет префиксом всех экшенов. Например: type: 'constructor/increment');
         initialState: initialState,
         reducers: {
-            sendAnOrder(state) {
-                state.fetching = true
-            },
-            cleanOrderState(state){
+            // Эти редюсеры будут доступны в приложении
+            cleanOrderState(state) {
                 state.name = ''
                 state.error = ''
                 state.orderNumber = 0
-                state.fetching= false
-            },
-            orderConfirmed(state, action: PayloadAction<ISubmitAnOrderResponse>) {
                 state.fetching = false
-                state.orderNumber = action.payload.order.number
-                state.error = ''
-                state.name = action.payload.name
             },
-            orderFailed(state, action: PayloadAction<string>) {
-                state.fetching = false
-                state.orderNumber = 0
-                state.name = ''
-                state.error = action.payload
-            },
+        },
+        // Эти редюсеры занимаются обработкой thunkов этого слайса. Thunkов может быть множество, не только submitAnOrderHandler
+        extraReducers: (builder) => {
+            /* смотрим на состояние промиса, который был создан здесь submitAnOrderHandler  и в соответствии с этим заполняем стейт */
+            builder
+                .addCase(submitAnOrderHandler.pending, (state) => {
+                    state.fetching = true
+                })
+                .addCase(submitAnOrderHandler.fulfilled, (state, action) => {
+                    state.fetching = false
+                    state.orderNumber = action.payload.order.number
+                    state.error = ''
+                    state.name = action.payload.name
+                })
+                .addCase(getIngredients.rejected, (state, action) => {
+                    state.fetching = false
+                    state.orderNumber = 0
+                    state.name = ''
+                    state.error = action.payload as string
+                });
         }
     })
 
 
 export const submitAnOrderHandler = createAsyncThunk(
     "submit/order",
-    //payloadCreator takes two arguments: the first one is the argument that you pass to the thunk action creator when you dispatch it,
-    // and the second one is an object with some useful properties and methods, such as getState, dispatch, rejectWithValue, etc.
-    // аргумент            // thunkAPI имеет getState и dispatch
-    async (ingredientIDs: Array<string>, thunkAPI) => {
-        submitAnOrderActions.sendAnOrder()
-        postOrder(ingredientIDs).then(x => {
-            thunkAPI.dispatch(submitAnOrderActions.orderConfirmed(x))
-        }).catch(e => {
-            thunkAPI.dispatch(submitAnOrderActions.orderFailed(e))
-            alert("can't create an order. See console")
-        })
-        // Можно вернуть инстанс созданного вебсокета. Но нам не нужно
-        // return websocket
+    async (ingredientIDs: Array<string>, { rejectWithValue, fulfillWithValue }) => {
+        try {
+           const resp = await postOrder(ingredientIDs);
+           if(resp){
+               return fulfillWithValue(resp)
+           }
+           return rejectWithValue("Error")
+        } catch (e) {
+            return rejectWithValue("Error")
+        }
     }
 )
 

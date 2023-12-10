@@ -9,7 +9,7 @@ import {
     IUserResponse
 } from "./Interfaces";
 
-let NORMA_API = "https://norma.nomoreparties.space/api"
+export let NORMA_API = "https://norma.nomoreparties.space/api"
 
 /* we need this function as there may be some cases when we can do some summary basing only on status code (201, 202 etc)
 * That's why it is better to parse json in the separate function just like we do with checkReponseStatusCode

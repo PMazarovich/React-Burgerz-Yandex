@@ -116,11 +116,12 @@ function formPendingAndCompleted(feed: IFeed): [number[], number[]] {
     return [pending, completed]
 }
 
+export function parseStatus(state: string): boolean {
+    return state === "done"
+}
 
 export function createOrderCardsFromFeed(feed: IFeed, genericIngredients: Array<IIngredient>): Array<IOrderCard> {
-    function parseStatus(state: string): boolean {
-        return state === "done"
-    }
+
     let result: Array<IOrderCard> = []
     // extract an ingredient by Id from genericIngredients
     feed.orders.forEach((order: IOrderFeed) => {
