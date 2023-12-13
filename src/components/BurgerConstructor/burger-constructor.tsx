@@ -63,7 +63,8 @@ function ScrollComponent({
     return (
         /* this is a div just to handle reordering components */
         <div className={constructorStyles.fullWidthHeight}>
-            <div ref={dropFoodContainerTarget}
+            <div id="drop_area"
+                ref={dropFoodContainerTarget}
                  style={{
                      maxHeight: calculateHeight(distanceFromBottom),
                  }}
@@ -280,7 +281,7 @@ function BurgerConstructor({
                         className={`${constructorStyles.marginRight10} text_type_main-large`}>{summ}</span>
                     <CurrencyIcon type="primary"/>
                 </div>
-                <Button onClick={submitAnOrder} htmlType="button" type="primary" size="large">
+                <Button id="submit_an_order_button" onClick={submitAnOrder} htmlType="button" type="primary" size="large">
                     Оформить заказ
                 </Button>
 

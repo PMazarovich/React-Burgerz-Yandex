@@ -33,7 +33,7 @@ function IngredientPage() {
         return (
             <span className={ingredientPageStyles.loader}></span>)
     } else {
-        return (<div className={ingredientPageStyles.centerColumn}>
+        return (<div id="ingredient_details_container" className={ingredientPageStyles.centerColumn}>
             <span className={'text_type_main-medium text_color_inactive flex-display'}> Детали ингредиента: </span>
             {ingredient && <>
                 <div

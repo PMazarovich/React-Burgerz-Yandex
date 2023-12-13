@@ -3,17 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@4tw/cypress-drag-drop": "^2.2.5",
     "@reduxjs/toolkit": "^1.9.5",
     "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.5.2",
     "@types/node": "^16.18.25",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.1",
     "@ya.praktikum/react-developer-burger-ui-components": "^1.14.0",
     "classnames": "^2.3.2",
     "immutability-helper": "^3.1.1",
+    "node-fetch": "2.6.11",
     "react": "^18.2.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
@@ -32,10 +32,13 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "jest-test": "jest",
+    "cypress:open": "./node_modules/.bin/cypress open"
   },
   "eslintConfig": {
     "extends": [
+      "plugin:cypress/recommended",
       "react-app",
       "react-app/jest"
     ]
@@ -52,8 +55,24 @@
       "last 1 safari version"
     ]
   },
+  "type": "module",
+  "babel": {
+    "presets": ["@babel/preset-env", "@babel/preset-typescript"],
+    "plugins": ["@babel/plugin-transform-arrow-functions"]
+  },
+  "supportFile": false,
   "devDependencies": {
+    "@babel/preset-env": "^7.23.6",
+    "@babel/preset-typescript": "^7.23.3",
+    "@testing-library/react": "^14.1.2",
+    "@types/jest": "^29.5.11",
     "@types/redux-logger": "^3.0.10",
-    "@types/uuid": "^9.0.4"
+    "@types/uuid": "^9.0.4",
+    "cypress": "^13.6.0",
+    "eslint-plugin-cypress": "^2.15.1",
+    "fetch-mock": "^9.11.0",
+    "jest": "^27.5.1",
+    "react-test-renderer": "^18.2.0",
+    "redux-mock-store": "^1.5.4"
   }
 }

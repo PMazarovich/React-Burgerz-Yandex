@@ -57,9 +57,13 @@ export const ingredientsSlice = createSlice(
 
 export const getIngredients = createAsyncThunk(
     "ingredients/get",
-    async () => {
-        const data = await getIngredientsAPI();
-        return data;
+    async (_, { rejectWithValue, fulfillWithValue }) => {
+        // return the promise from getIngredientsAPI
+        const res = await getIngredientsAPI();
+        if (!res) {
+            return rejectWithValue('Error')
+        }
+        return fulfillWithValue(res)
     }
 );
 
